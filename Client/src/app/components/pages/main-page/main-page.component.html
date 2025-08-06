@@ -1,0 +1,15 @@
+<div class="app-container">
+  <section class="side-panel">
+    <!--
+      Inside side nav component, add loigc:
+      If url is /profile display html for profile nav.
+      If url is /checklist/1 display nav for checklists
+    -->
+    <app-side-nav />
+  </section>
+
+  <section>
+    <app-header-nav></app-header-nav>
+    <router-outlet />
+  </section>
+</div>

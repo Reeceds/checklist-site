@@ -1,1 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
+@import "./partials/_variables";
+@import "./partials/_typography";
+@import "./partials/_mixins";
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  color: $text-color-1;
+  font-size: 14px;
+  background-color: $color-1;
+}
+
+.page-container {
+  padding-top: 2.5rem;
+  padding-bottom: 5rem;
+}
