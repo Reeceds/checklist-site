@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { Database } from "sqlite";
 import { connectDB } from "../db";
 import { checklistItem } from "../models/checklistItem";
+import { AuthRequest } from "../middleware/authorize";
 
 // POST create, update, delete
-export const modifyChecklistItem = async (req: Request, res: Response) => {
+export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
     try {
         const checklistId = req.params.id;
         const reqData: checklistItem[] = req.body;
@@ -32,7 +33,7 @@ export const modifyChecklistItem = async (req: Request, res: Response) => {
                 await Promise.all(
                     updatedItems.map((e: checklistItem) => {
                         db.run(
-                            "UPDATE checklistItem SET content = ?, isChecked = ?, position = ?, date_modified = CURRENT_TIMESTAMP WHERE id = ?",
+                            "UPDATE checklistItem SET content = ?, isChecked = ?, position = ?, dateModified = CURRENT_TIMESTAMP WHERE id = ?",
                             e.content,
                             e.isChecked,
                             e.position,

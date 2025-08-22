@@ -2,10 +2,10 @@ import { Component, HostListener, NgZone, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header-nav',
-  standalone: true,
   imports: [FontAwesomeModule, RouterLink, RouterLinkActive],
   templateUrl: './header-nav.component.html',
   styleUrl: './header-nav.component.scss',
@@ -17,14 +17,14 @@ export class HeaderNavComponent implements OnInit {
   tablesSizePx: number = 992;
   tabletSize: boolean = false;
 
-  constructor() {}
+  constructor(private _authService: AuthService) {}
 
   ngOnInit(): void {
     this.TabletSizeOnPageLoad();
   }
 
   logout() {
-    // this._authService.logout();
+    this._authService.logout();
   }
 
   // Checks if the screen is tablet size on page resize (makes sure that the profile icon is removed when tablet size)

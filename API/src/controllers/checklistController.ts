@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { connectDB } from "../db";
 import { Database } from "sqlite";
 import { Checklist } from "../models/checklist";
+import { AuthRequest } from "../middleware/authorize";
 
 // GET all
-export const getChecklists = async (_req: Request, res: Response) => {
+export const getChecklists = async (_req: AuthRequest, res: Response) => {
     try {
         const db: Database = await connectDB();
         const checklists: Checklist[] = await db.all("SELECT * FROM checklist");
@@ -16,7 +17,7 @@ export const getChecklists = async (_req: Request, res: Response) => {
 };
 
 // GET by ID
-export const getChecklistById = async (req: Request, res: Response) => {
+export const getChecklistById = async (req: AuthRequest, res: Response) => {
     try {
         const id = Number(req.params.id);
 
@@ -32,7 +33,7 @@ export const getChecklistById = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Item not found" });
         }
 
-        const checklistResult = {
+        const checklistResult: Checklist = {
             ...checklist,
             checklistItems: checklistItems,
         };
@@ -44,7 +45,7 @@ export const getChecklistById = async (req: Request, res: Response) => {
 };
 
 // POST create
-export const createChecklist = async (req: Request, res: Response) => {
+export const createChecklist = async (req: AuthRequest, res: Response) => {
     try {
         const { title } = req.body;
 
@@ -62,7 +63,7 @@ export const createChecklist = async (req: Request, res: Response) => {
 };
 
 // PUT update
-export const updateChecklist = async (req: Request, res: Response) => {
+export const updateChecklist = async (req: AuthRequest, res: Response) => {
     try {
         const id = Number(req.params.id);
         const { title } = req.body;
@@ -79,7 +80,7 @@ export const updateChecklist = async (req: Request, res: Response) => {
         }
 
         const result = await db.run(
-            "UPDATE checklist SET title = ?, date_modified = CURRENT_TIMESTAMP WHERE id = ?",
+            "UPDATE checklist SET title = ?, dateModified = CURRENT_TIMESTAMP WHERE id = ?",
             title,
             id
         );
@@ -91,7 +92,7 @@ export const updateChecklist = async (req: Request, res: Response) => {
 };
 
 // DELETE
-export const deleteChecklist = async (req: Request, res: Response) => {
+export const deleteChecklist = async (req: AuthRequest, res: Response) => {
     try {
         const id = Number(req.params.id);
         if (isNaN(id)) {

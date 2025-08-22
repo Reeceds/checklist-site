@@ -6,13 +6,14 @@ import {
     deleteChecklist,
     updateChecklist,
 } from "../controllers/checklistController";
+import { authorize } from "../middleware/authorize";
 
 const router = Router();
 
-router.get("/", getChecklists);
-router.get("/:id", getChecklistById);
-router.post("/", createChecklist);
-router.put("/edit/:id", updateChecklist);
-router.delete("/delete/:id", deleteChecklist);
+router.get("/", authorize, getChecklists);
+router.get("/:id", authorize, getChecklistById);
+router.post("/", authorize, createChecklist);
+router.put("/edit/:id", authorize, updateChecklist);
+router.delete("/delete/:id", authorize, deleteChecklist);
 
 export default router;

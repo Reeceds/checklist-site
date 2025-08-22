@@ -1,0 +1,15 @@
+@import "../../../partials/variables";
+@import "../../../partials/mixins";
+
+.google-btn {
+  border-radius: 100px;
+  background-color: #51d6ca;
+  padding: 10px 25px;
+  color: #240090;
+  border: 2px solid #51d6ca;
+
+  &:hover {
+    color: #51d6ca;
+    background-color: unset;
+  }
+}
