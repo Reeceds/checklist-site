@@ -3,6 +3,7 @@ import { checklistItem } from "./checklistItem";
 export interface Checklist {
     id: number;
     title: string;
-    date_modified: string;
+    dateModified: string;
     checklistItems?: checklistItem[];
+    userId: number;
 }

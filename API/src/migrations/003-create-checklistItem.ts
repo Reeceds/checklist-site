@@ -9,6 +9,7 @@ export const up: MigrationFn<Database> = async ({ context: db }) => {
       isChecked BOOLEAN NOT NULL,
       position INTEGER NOT NULL,
       dateModified DATETIME DEFAULT CURRENT_TIMESTAMP,
+      userId INTEGER NOT NULL,
       checklistId INTEGER NOT NULL,
       FOREIGN KEY (checklistId) REFERENCES checklist(id) ON DELETE CASCADE
     );

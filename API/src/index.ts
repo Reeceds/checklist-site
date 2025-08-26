@@ -11,6 +11,7 @@ import checklistRoutes from "./routes/checklistRoutes";
 import checklistItemRoutes from "./routes/checklistItemRoutes";
 import configRoutes from "./routes/configRoutes";
 import authenticationRoutes from "./routes/authenticationRoutes";
+import userRoutes from "./routes/userRoutes";
 
 const app: express.Application = express();
 const port: number = 3000;
@@ -35,6 +36,7 @@ app.use("/api/config", configRoutes);
 app.use("/api/checklist", checklistRoutes);
 app.use("/api/checklistItem", checklistItemRoutes);
 app.use("/api/authentication", authenticationRoutes);
+app.use("/api/current-user", userRoutes);
 
 server.listen(port, async () => {
     await runMigrations().catch((err) => {

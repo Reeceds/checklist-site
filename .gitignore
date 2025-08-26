@@ -19,6 +19,9 @@
 # Angular
 **/.angular
 
+# ssl
+**.pem
+
 # OS and IDE junk
 .DS_Store
 Thumbs.db

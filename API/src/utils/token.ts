@@ -8,7 +8,7 @@ export function generateAccessToken(userId: number) {
     return jwt.sign(
         { sub: userId }, // claims
         ACCESS_TOKEN_SECRET,
-        { expiresIn: "5m" }
+        { expiresIn: "30m" }
     );
 }
 

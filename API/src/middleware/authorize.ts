@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+//! Sets the logged in users details as a global variable req.user
 export interface AuthRequest extends Request {
     user?: any;
 }

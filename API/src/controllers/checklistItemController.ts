@@ -7,6 +7,12 @@ import { AuthRequest } from "../middleware/authorize";
 // POST create, update, delete
 export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
     try {
+        const userId = req.user.sub;
+
+        if (userId === null || userId === undefined) {
+            return res.status(401).json("User not found.");
+        }
+
         const checklistId = req.params.id;
         const reqData: checklistItem[] = req.body;
 
@@ -15,7 +21,11 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
         if (!reqData.length || invalidData) return res.status(400).json({ message: "Invalid checklist content" });
 
         const db: Database = await connectDB();
-        const dbItems = await db.all("SELECT * FROM checklistitem WHERE checklistId = ?", checklistId);
+        const dbItems = await db.all(
+            "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ?",
+            checklistId,
+            userId
+        );
 
         if (dbItems.length) {
             // UPDATE
@@ -62,12 +72,13 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
         if (newItems.length) {
             await Promise.all(
                 newItems.map((e: checklistItem) => {
-                    db.run(
-                        "INSERT INTO checklistItem (content, checklistId, isChecked, position) VALUES (?, ?, ?, ?)",
+                    return db.run(
+                        "INSERT INTO checklistItem (content, checklistId, isChecked, position, userId) VALUES (?, ?, ?, ?, ?)",
                         e.content,
-                        e.checklistId,
+                        checklistId,
                         e.isChecked ?? 0,
-                        e.position ?? 0
+                        e.position ?? 0,
+                        userId
                     );
                 })
             );

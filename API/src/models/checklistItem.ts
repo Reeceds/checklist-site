@@ -3,6 +3,7 @@ export interface checklistItem {
     content: string;
     isChecked: boolean;
     position: number;
-    date_modified: string;
+    dateModified: string;
     checklistId: number;
+    userId: number;
 }
