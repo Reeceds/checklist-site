@@ -16,9 +16,10 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
         const checklistId = req.params.id;
         const reqData: checklistItem[] = req.body;
 
-        const invalidData = reqData.some((e) => typeof e.content !== "string" || !e.content.trim());
-
-        if (!reqData.length || invalidData) return res.status(400).json({ message: "Invalid checklist content" });
+        if (reqData.length) {
+            const invalidData = reqData.some((e) => typeof e.content !== "string" || !e.content.trim());
+            if (invalidData) return res.status(400).json({ message: "Invalid checklist content" });
+        }
 
         const db: Database = await connectDB();
         const dbItems = await db.all(

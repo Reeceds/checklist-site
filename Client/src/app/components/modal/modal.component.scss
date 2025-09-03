@@ -1,0 +1,27 @@
+@import "../../../partials/mixins";
+@import "../../../partials/variables";
+@import "../../../partials/typography";
+
+.modal-component {
+  padding: 2rem;
+
+  &_overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    // background-color: $color-7;
+    opacity: 0.9;
+  }
+
+  &_container {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    // background-color: $color-3;
+    z-index: 2;
+    border-radius: 20px;
+  }
+}

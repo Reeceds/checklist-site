@@ -11,8 +11,6 @@ import { User } from '../models/user';
 export class AuthService {
   private url = environment.apiUrl;
   private accessToken: string | null = null;
-  currentUserSource = new BehaviorSubject({}); // Store access token in memory
-  currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -51,10 +49,6 @@ export class AuthService {
       {},
       { withCredentials: true }
     );
-  }
-
-  setCurrentUser(userDetails: User) {
-    this.currentUserSource.next(userDetails);
   }
 
   logout() {

@@ -42,7 +42,7 @@ export const getChecklistById = async (req: AuthRequest, res: Response) => {
             userId
         );
         const checklistItems = await db.all(
-            "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ?",
+            "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ? ORDER BY position ASC;",
             id,
             userId
         );
@@ -73,7 +73,7 @@ export const createChecklist = async (req: AuthRequest, res: Response) => {
         const { title } = req.body;
 
         if (typeof title !== "string" || !title.trim()) {
-            return res.status(400).json({ message: "Invalid item data" });
+            return res.status(400).json({ message: "Invalid item data. Please enter a title." });
         }
 
         const db: Database = await connectDB();
@@ -96,8 +96,12 @@ export const updateChecklist = async (req: AuthRequest, res: Response) => {
         const id = Number(req.params.id);
         const { title } = req.body;
 
-        if (isNaN(id) || typeof title !== "string" || !title.trim()) {
-            return res.status(400).json({ message: "Invalid input" });
+        if (isNaN(id)) {
+            return res.status(400).json({ message: "Invalid input id." });
+        }
+
+        if (typeof title !== "string" || !title.trim()) {
+            return res.status(400).json({ message: "Invalid item data. Please enter a title." });
         }
 
         const db: Database = await connectDB();

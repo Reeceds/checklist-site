@@ -1,3 +1,77 @@
 <div class="container">
-  <h1>checklist-page works!</h1>
+  <h1>{{ checklist?.title }}</h1>
+  @if (checklist) { @if ((uncheckedItems && uncheckedItems.length > 0) ||
+  (checkedItems && checkedItems.length > 0)) { @if (uncheckedItems) {
+  <ul cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+    @for (item of uncheckedItems; track item.tempId) {
+    <li class="d-flex" cdkDrag>
+      <input
+        aria-label="Checkbox"
+        type="checkbox"
+        [checked]="item.isChecked"
+        [(ngModel)]="item.isChecked"
+        (ngModelChange)="onToggleChecked(item.tempId!)"
+      />
+      <textarea
+        class="w-100"
+        aria-label="Checklist item content"
+        [(ngModel)]="item.content"
+        (ngModelChange)="onEditContent($event, item.tempId!)"
+        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
+        rows="1"
+      >
+      </textarea>
+      <button
+        type="button"
+        (click)="onDeleteItem(item.isChecked, item.tempId!)"
+      >
+        Delete
+      </button>
+    </li>
+    }
+  </ul>
+  } @if (checkedItems) {
+  <ul class="mt-5">
+    <p>Complete</p>
+    @for (item of checkedItems; track item.tempId) {
+    <li class="d-flex">
+      <input
+        aria-label="Checkbox"
+        type="checkbox"
+        [checked]="item.isChecked"
+        [(ngModel)]="item.isChecked"
+        (ngModelChange)="onToggleChecked(item.tempId!)"
+      />
+      <textarea
+        class="w-100"
+        aria-label="Checklist item content"
+        [(ngModel)]="item.content"
+        (ngModelChange)="onEditContent($event, item.tempId!)"
+        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
+        rows="1"
+      >
+      </textarea>
+      <button
+        type="button"
+        (click)="onDeleteItem(item.isChecked, item.tempId!)"
+      >
+        Delete
+      </button>
+    </li>
+    }
+  </ul>
+  } } @else {
+  <p>Add a checklist item.</p>
+  } } @else {
+  <p>Start by creating a checklist.</p>
+  }
 </div>
+
+@if (checklist) {
+<div class="container">
+  <app-input-save
+    (newItem)="onAddItem($event)"
+    (saveChecklist)="onSaveItems()"
+  />
+</div>
+}

@@ -1,3 +1,156 @@
 <div class="container">
-  <p>side-nav works!</p>
+  @if (isProfileNav) {
+  <div class="">
+    <a class="" routerLink="/app/profile" routerLinkActive="active"
+      >Account details
+    </a>
+  </div>
+
+  } @if (isChecklistNav) { @if (checklistData && checklistData.length > 0) {
+  <button type="button" (click)="openCreateModal()">Create</button>
+  @for (checklist of checklistData; track $index) {
+  <div class="">
+    <a
+      class=""
+      routerLink="/app/checklist/{{ checklist.id }}"
+      routerLinkActive="active"
+      >{{ checklist.title }}
+    </a>
+    <button
+      type="button"
+      (click)="openEditModal(checklist.id!, checklist.title!)"
+    >
+      Edit
+    </button>
+    <button type="button" (click)="openDeleteModal(checklist.id!)">
+      Delete
+    </button>
+  </div>
+  } } @else {
+  <button type="button" (click)="openCreateModal()">Create</button>
+  } }
 </div>
+
+<!-- CREATE MODAL -->
+<app-modal
+  [style]="'modal-form-width'"
+  *ngIf="isCreateModalOpen"
+  (closeModal)="closeModal()"
+>
+  <form
+    class="modal-filter_form"
+    [formGroup]="createChecklistForm"
+    (ngSubmit)="onCreateChecklistSubmit()"
+  >
+    <p class="modal-filter_heading">Add checklist</p>
+    <div class="input-container modal-filter_text-input-container">
+      <input
+        class="modal-filter_text-input"
+        type="text"
+        placeholder="Enter checklist name"
+        formControlName="title"
+        required
+        [(ngModel)]="checklistName"
+      />
+      <small class="form-error-text"
+        >Character limit: {{ 50 - checklistName?.length! }} / 50</small
+      >
+      @if (createChecklistFormSubmitted && emptyChecklistError){
+      <small class="form-error-text">Please enter a title</small>
+      } @else if (createChecklistFormSubmitted && duplicateChecklistError) {
+      <small class="form-error-text"
+        >A checklist with this title already exists</small
+      >
+      } @else if (createChecklistFormSubmitted && serverError) {
+      <small class="form-error-text">Server error creating checklist</small>
+      }
+    </div>
+
+    <div class="modal-filter_btn-container">
+      <button
+        class="modal-filter_cancel-btn"
+        type="button"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button class="modal-filter_submit-btn" type="submit">Submit</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- EDIT MODAL -->
+<app-modal
+  [style]="'modal-form-width'"
+  *ngIf="isEditModalOpen"
+  (closeModal)="closeModal()"
+>
+  <form
+    class="modal-filter_form"
+    [formGroup]="editChecklistForm"
+    (ngSubmit)="editChecklistSubmit()"
+  >
+    <p class="modal-filter_heading">Edit checklist</p>
+    <div class="input-container modal-filter_text-input-container">
+      <input
+        class="modal-filter_text-input"
+        type="text"
+        placeholder="Enter checklist name"
+        formControlName="title"
+        required
+        [(ngModel)]="editChecklistForm.value.title"
+      />
+      <small class="form-error-text"
+        >Character limit: {{ 50 - checklistName?.length! }} / 50</small
+      >
+      @if (editChecklistFormSubmitted && emptyChecklistError){
+      <small class="form-error-text">Please enter a title</small>
+      } @else if (editChecklistFormSubmitted && duplicateChecklistError) {
+      <small class="form-error-text"
+        >A checklist with this title already exists</small
+      >
+      } @else if (editChecklistFormSubmitted && serverError) {
+      <small class="form-error-text">Server error creating checklist</small>
+      }
+    </div>
+
+    <div class="modal-filter_btn-container">
+      <button
+        class="modal-filter_cancel-btn"
+        type="button"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button class="modal-filter_submit-btn" type="submit">Submit</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- DELETE MODAL -->
+<app-modal
+  [style]="'modal-form-width'"
+  *ngIf="isDeleteModalOpen"
+  (closeModal)="closeModal()"
+>
+  <div class="modal-filter_form">
+    <p class="modal-filter_heading">Remove checklist</p>
+    <p>Are you sure you want to remove this checklist?</p>
+    <div class="modal-filter_btn-container">
+      <button
+        class="modal-filter_cancel-btn"
+        type="button"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button
+        class="modal-filter_submit-btn"
+        type="submit"
+        (click)="deleteChecklistSubmit(checklistToDelete!)"
+      >
+        Yes
+      </button>
+    </div>
+  </div>
+</app-modal>

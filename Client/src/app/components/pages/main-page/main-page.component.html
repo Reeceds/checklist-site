@@ -9,7 +9,11 @@
   </section>
 
   <section>
-    <app-header-nav></app-header-nav>
+    <app-header-nav />
     <router-outlet />
+    <!-- <router-outlet (activate)="toggleInputBar($event)" />
+    @if (showInputBar) {
+    <app-input-save />
+    } -->
   </section>
 </div>

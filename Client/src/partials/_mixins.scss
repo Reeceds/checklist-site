@@ -1,0 +1,59 @@
+@import "variables";
+@import "typography";
+
+@mixin xl-display {
+  @media screen and (max-width: 1400px) {
+    @content;
+  }
+}
+
+@mixin lg-display {
+  @media screen and (max-width: 1200px) {
+    @content;
+  }
+}
+
+@mixin md-display {
+  @media screen and (max-width: 992px) {
+    @content;
+  }
+}
+
+@mixin sm-display {
+  @media screen and (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin xs-display {
+  @media screen and (max-width: 576px) {
+    @content;
+  }
+}
+
+@mixin btn-default {
+  border-radius: 30px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+@mixin text-input {
+  width: 100%;
+  padding-bottom: 0.6rem;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 2px solid $color-5;
+  background-color: unset;
+  color: $color-5;
+
+  &:focus {
+    outline: none;
+  }
+}

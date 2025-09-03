@@ -14,3 +14,35 @@ body {
   padding-top: 2.5rem;
   padding-bottom: 5rem;
 }
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// MODAL STYLES
+.modal-form-width {
+  max-width: 500px;
+  width: 100%;
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+// INPUT STYLES
+.input-container {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form_label {
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+}

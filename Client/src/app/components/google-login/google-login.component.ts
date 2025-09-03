@@ -29,7 +29,7 @@ export class GoogleLoginComponent {
   isLoading: boolean = false;
   isServerError: boolean = false;
 
-  user: User = {};
+  user: User | undefined;
 
   constructor(
     private _socialAuthService: SocialAuthService,
@@ -82,8 +82,7 @@ export class GoogleLoginComponent {
               ...this.user,
             };
 
-            this._authService.setCurrentUser(this.user);
-            this.router.navigate(['/app']);
+            this.router.navigate(['/app/checklist']);
           }
         },
         error: (err) => {

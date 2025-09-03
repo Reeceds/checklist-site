@@ -26,6 +26,11 @@ export const routes: Routes = [
         component: ChecklistPageComponent,
         title: 'checklist Page',
       },
+      {
+        path: 'checklist',
+        component: ChecklistPageComponent,
+        title: 'checklist Page',
+      },
     ],
   },
 ];

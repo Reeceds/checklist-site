@@ -1,0 +1,16 @@
+<div class="container d-flex">
+  <form
+    class="d-flex w-100"
+    [formGroup]="createChecklistItem"
+    (ngSubmit)="createChecklistItemSubmit()"
+  >
+    <input
+      aria-label="Enter checklist item"
+      formControlName="content"
+      type="text"
+      class="w-100"
+    />
+    <button type="submit">Submit</button>
+  </form>
+  <button type="button" (click)="save()">Save</button>
+</div>

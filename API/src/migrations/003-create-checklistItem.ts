@@ -6,7 +6,7 @@ export const up: MigrationFn<Database> = async ({ context: db }) => {
     CREATE TABLE IF NOT EXISTS checklistItem (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       content TEXT NOT NULL,
-      isChecked BOOLEAN NOT NULL,
+      isChecked NUMBER NOT NULL,
       position INTEGER NOT NULL,
       dateModified DATETIME DEFAULT CURRENT_TIMESTAMP,
       userId INTEGER NOT NULL,
