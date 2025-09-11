@@ -1,4 +1,11 @@
-import { Component, DestroyRef, inject, input, OnInit } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,8 +20,19 @@ import {
   CdkDropList,
   CdkDrag,
   moveItemInArray,
+  CdkDragHandle,
 } from '@angular/cdk/drag-drop';
 import { ModalComponent } from '../../modal/modal.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faGripLines,
+  faTrash,
+  faTrashCan,
+} from '@fortawesome/free-solid-svg-icons';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { ToastrService } from 'ngx-toastr';
+import { EventTriggerService } from '../../../services/event-trigger.service';
 
 @Component({
   selector: 'app-checklist-page',
@@ -24,11 +42,19 @@ import { ModalComponent } from '../../modal/modal.component';
     ReactiveFormsModule,
     CdkDropList,
     CdkDrag,
+    CdkDragHandle,
+    FontAwesomeModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './checklist-page.component.html',
   styleUrl: './checklist-page.component.scss',
 })
 export class ChecklistPageComponent implements OnInit {
+  faGripLines = faGripLines;
+  faTrash = faTrash;
+  faTrashCan = faTrashCan;
+
   destroyRef = inject(DestroyRef);
 
   checklist: Checklist | undefined;
@@ -37,15 +63,28 @@ export class ChecklistPageComponent implements OnInit {
 
   paramId: number | undefined;
 
+  textValue = localStorage.getItem('textareaValue') || '';
+  savedHeight = Number(localStorage.getItem('textareaHeight')) || null;
+
   constructor(
     private checklistService: ChecklistService,
     private route: ActivatedRoute,
     private router: Router,
-    private checklistItemService: ChecklistItemService
+    private checklistItemService: ChecklistItemService,
+    private toastr: ToastrService,
+    private eventTriggerService: EventTriggerService
   ) {}
 
   ngOnInit(): void {
     this.getChecklistById();
+
+    this.eventTriggerService.event$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        if (res === 'refreshChecklistData') {
+          this.getChecklistById();
+        }
+      });
   }
 
   getChecklistById() {
@@ -77,7 +116,6 @@ export class ChecklistPageComponent implements OnInit {
                     tempId: i,
                   }));
               }
-              console.log('ggg', this.checklist);
             },
             error: (err) => console.log('Failed to get checklist: ', err),
           });
@@ -110,9 +148,13 @@ export class ChecklistPageComponent implements OnInit {
     this.uncheckedItems!.push(item);
   }
 
-  onEditContent(value: string, id: number) {
-    const editCheckedItem = this.checkedItems?.find((i) => i.tempId === id);
-    const edituncheckedItem = this.checkedItems?.find((i) => i.tempId === id);
+  onEditContent(value: string, id: number, chekedVal: any) {
+    const editCheckedItem = this.checkedItems?.find(
+      (i) => i.tempId === id && i.isChecked === chekedVal
+    );
+    const edituncheckedItem = this.uncheckedItems?.find(
+      (i) => i.tempId === id && i.isChecked === chekedVal
+    );
     if (editCheckedItem) editCheckedItem!.content = value;
     if (edituncheckedItem) edituncheckedItem!.content = value;
   }
@@ -196,8 +238,14 @@ export class ChecklistPageComponent implements OnInit {
       .modifyChecklistItem(this.paramId!, items!)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => {},
+        next: (_) => {
+          this.toastr.success('Saved', '', {
+            timeOut: 1000,
+          });
+          this.eventTriggerService.trigger('refreshChecklistData');
+        },
         error: (err) => {
+          this.toastr.error('Error');
           console.log('Error saving checklistItems: ', err);
         },
       });
@@ -213,7 +261,5 @@ export class ChecklistPageComponent implements OnInit {
     this.uncheckedItems!.map((el, i) => {
       el.position = i + 1;
     });
-
-    console.log(this.uncheckedItems);
   }
 }

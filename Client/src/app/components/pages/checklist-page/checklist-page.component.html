@@ -1,77 +1,89 @@
-<div class="container">
-  <h1>{{ checklist?.title }}</h1>
+<div class="page-container checklist-page">
+  <h1 class="checklist-title">{{ checklist?.title }}</h1>
   @if (checklist) { @if ((uncheckedItems && uncheckedItems.length > 0) ||
-  (checkedItems && checkedItems.length > 0)) { @if (uncheckedItems) {
-  <ul cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+  (checkedItems && checkedItems.length > 0)) { @if (uncheckedItems &&
+  uncheckedItems.length > 0) {
+  <ul
+    cdkDropList
+    class="example-list checklist-items-container"
+    (cdkDropListDropped)="drop($event)"
+  >
     @for (item of uncheckedItems; track item.tempId) {
-    <li class="d-flex" cdkDrag>
-      <input
-        aria-label="Checkbox"
-        type="checkbox"
-        [checked]="item.isChecked"
-        [(ngModel)]="item.isChecked"
-        (ngModelChange)="onToggleChecked(item.tempId!)"
-      />
-      <textarea
-        class="w-100"
-        aria-label="Checklist item content"
-        [(ngModel)]="item.content"
-        (ngModelChange)="onEditContent($event, item.tempId!)"
-        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
-        rows="1"
-      >
-      </textarea>
-      <button
-        type="button"
+    <li class="checklist-item" cdkDrag>
+      <fa-icon
+        class="fa-xl position-icon"
+        [icon]="faGripLines"
+        cdkDragHandle
+      ></fa-icon>
+      <label class="checkbox-container">
+        <input
+          aria-label="Checkbox"
+          type="checkbox"
+          checked="checked"
+          [checked]="item.isChecked"
+          [(ngModel)]="item.isChecked"
+          (ngModelChange)="onToggleChecked(item.tempId!)"
+        />
+        <span class="checkmark"></span>
+      </label>
+      <mat-form-field appearance="fill" class="item-input">
+        <textarea
+          matInput
+          cdkTextareaAutosize
+          #autosize="cdkTextareaAutosize"
+          [(ngModel)]="item.content"
+          (ngModelChange)="onEditContent($event, item.tempId!, item.isChecked)"
+          aria-label="Checklist item content"
+        ></textarea>
+      </mat-form-field>
+      <fa-icon
+        class="fa-md delete-icon"
+        [icon]="faTrashCan"
         (click)="onDeleteItem(item.isChecked, item.tempId!)"
-      >
-        Delete
-      </button>
+      ></fa-icon>
     </li>
     }
   </ul>
-  } @if (checkedItems) {
-  <ul class="mt-5">
-    <p>Complete</p>
+  } @if (checkedItems && checkedItems.length > 0) {
+  <ul class="">
     @for (item of checkedItems; track item.tempId) {
-    <li class="d-flex">
-      <input
-        aria-label="Checkbox"
-        type="checkbox"
-        [checked]="item.isChecked"
-        [(ngModel)]="item.isChecked"
-        (ngModelChange)="onToggleChecked(item.tempId!)"
-      />
-      <textarea
-        class="w-100"
-        aria-label="Checklist item content"
-        [(ngModel)]="item.content"
-        (ngModelChange)="onEditContent($event, item.tempId!)"
-        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
-        rows="1"
-      >
-      </textarea>
-      <button
-        type="button"
+    <li class="checklist-item">
+      <label class="checkbox-container">
+        <input
+          aria-label="Checkbox"
+          type="checkbox"
+          checked="checked"
+          [checked]="item.isChecked"
+          [(ngModel)]="item.isChecked"
+          (ngModelChange)="onToggleChecked(item.tempId!)"
+        />
+        <span class="checkmark"></span>
+      </label>
+      <mat-form-field appearance="fill" class="w-100">
+        <textarea
+          matInput
+          cdkTextareaAutosize
+          #autosize="cdkTextareaAutosize"
+          [(ngModel)]="item.content"
+          (ngModelChange)="onEditContent($event, item.tempId!, item.isChecked)"
+          aria-label="Checklist item content"
+        ></textarea>
+      </mat-form-field>
+      <fa-icon
+        class="fa-md delete-icon"
+        [icon]="faTrashCan"
         (click)="onDeleteItem(item.isChecked, item.tempId!)"
-      >
-        Delete
-      </button>
+      ></fa-icon>
     </li>
     }
   </ul>
   } } @else {
-  <p>Add a checklist item.</p>
+  <p class="default-text">Add a checklist item.</p>
   } } @else {
-  <p>Start by creating a checklist.</p>
+  <p class="default-text">Start by creating a checklist.</p>
   }
 </div>
 
 @if (checklist) {
-<div class="container">
-  <app-input-save
-    (newItem)="onAddItem($event)"
-    (saveChecklist)="onSaveItems()"
-  />
-</div>
+<app-input-save (newItem)="onAddItem($event)" (saveChecklist)="onSaveItems()" />
 }

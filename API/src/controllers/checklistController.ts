@@ -3,6 +3,7 @@ import { connectDB } from "../db";
 import { Database } from "sqlite";
 import { Checklist } from "../models/checklist";
 import { AuthRequest } from "../middleware/authorize";
+import { checklistItem } from "../models/checklistItem";
 
 // GET all
 export const getChecklists = async (req: AuthRequest, res: Response) => {
@@ -13,7 +14,11 @@ export const getChecklists = async (req: AuthRequest, res: Response) => {
         }
 
         const db: Database = await connectDB();
-        const checklists: Checklist[] = await db.all("SELECT * FROM checklist WHERE userId = ?", userId);
+
+        const checklists: Checklist[] = await db.all(
+            "SELECT * FROM checklist WHERE userId = ? ORDER BY dateModified DESC",
+            userId
+        );
 
         res.status(200).json(checklists);
     } catch (err) {
@@ -77,7 +82,7 @@ export const createChecklist = async (req: AuthRequest, res: Response) => {
         }
 
         const db: Database = await connectDB();
-        const result = await db.run("INSERT INTO checklist (title, userId) VALUES (?, ?)", title, userId);
+        const result = await db.run("INSERT INTO checklist (title, userId) VALUES (?, ?);", title, userId);
 
         res.status(201).json({ id: result.lastID, title });
     } catch (err) {

@@ -1,0 +1,49 @@
+@import "../../../partials/variables";
+@import "../../../partials/mixins";
+
+.item-input-section {
+  display: flex;
+  padding: 35px;
+  border-top: 1px solid $color-3;
+  background-color: $color-1;
+}
+
+.item-input-form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.item-input {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 7px 40px 7px 10px;
+  background-color: $color-2;
+  color: $text-color-1;
+  border: 0;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.submit-item-btn {
+  color: $color-3;
+  position: relative;
+  right: 25px;
+  cursor: pointer;
+}
+
+.submit-item-btn:hover {
+  color: $text-color-1;
+}
+
+.save-checklist-btn {
+  @include reg-btn-1;
+  margin-left: 10px;
+
+  &:hover {
+    @include reg-btn-1-hover;
+  }
+}

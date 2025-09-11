@@ -15,16 +15,24 @@ import {
 } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ChecklistItem } from '../../models/checklistItem';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-input-save',
-  imports: [ReactiveFormsModule],
+  // 'host' allows a class to be added to a component which is rendered via <router-outlet>
+  host: {
+    class: 'input-save-component',
+  },
+  imports: [ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './input-save.component.html',
   styleUrl: './input-save.component.scss',
 })
 export class InputSaveComponent implements OnInit {
   destroyRef = inject(DestroyRef);
   fb = inject(NonNullableFormBuilder);
+
+  faPlus = faPlus;
 
   @Output() newItem = new EventEmitter<ChecklistItem>();
   @Output() saveChecklist = new EventEmitter<void>();

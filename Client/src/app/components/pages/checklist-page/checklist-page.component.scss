@@ -1,3 +1,9 @@
+@import "../../../../partials/variables";
+
+textarea {
+  caret-color: $color-4 !important;
+}
+
 .example-list {
   width: 500px;
   max-width: 100%;
@@ -25,26 +31,135 @@
   font-family: sans-serif;
 }
 
-.cdk-drag-preview {
-  border: none;
-  box-sizing: border-box;
-  border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+.checklist-page {
+  padding-left: 35px;
+  padding-right: 35px;
+  padding-bottom: 7rem !important;
+  height: 90vh;
+  overflow-y: scroll;
 }
 
-.cdk-drag-placeholder {
+.checklist-title {
+  margin-left: 65px;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.checklist-items-container {
+  width: 100%;
+  border: unset;
+  background-color: unset;
+  padding-left: 0;
+  margin-bottom: 50px;
+}
+
+.checklist-item {
+  display: flex;
+  margin-bottom: 0.5rem;
+  background-color: $color-1;
+}
+
+.position-icon {
+  cursor: grab;
+  color: $color-3;
+  margin-right: 15px;
+  transition: color 0.25s ease-in-out;
+
+  &:hover {
+    color: $color-6;
+  }
+}
+
+.item-checkbox {
+  margin-right: 15px;
+}
+
+.item-input {
+  width: 100%;
+}
+
+.delete-icon {
+  cursor: pointer;
+  color: $color-3;
+  margin-left: 30px;
+  transition: color 0.25s ease-in-out;
+
+  &:hover {
+    color: $color-6;
+  }
+}
+
+.default-text {
+  margin-left: 62px;
+}
+
+// CHECKBOX STYLES
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.checkbox-container input {
+  position: absolute;
   opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
 }
 
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 23px;
+  width: 23px;
+  background-color: none;
+  border: 1px solid $color-3;
+  border-radius: 100px;
 }
 
-.example-box:last-child {
-  border: none;
+/* On mouse-over, add a grey background color */
+.checkbox-container:hover input ~ .checkmark {
+  border-color: $color-6;
 }
 
-.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+/* When the checkbox is checked, add a blue background */
+.checkbox-container input:checked ~ .checkmark {
+  // border: 1px solid $color-6;
+  background-color: $color-6;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-container .checkmark:after {
+  left: 8px;
+  top: 4px;
+  width: 5px;
+  height: 12px;
+  border: solid $color-3;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
 }

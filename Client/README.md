@@ -58,6 +58,16 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 
+## App versions
+
 Angular CLI: 19.0.0
 Node: 22.17.1
 Package Manager: npm 10.9.2
+
+## Technical applications
+
+- @Output() and EventEmitter which allows a reusable child component to submit and input value and retrieve this on the parent component
+- Toastr service to display alerts when e.g. data is sumitted successfully or alert an error.
+- EventTriggerService. This allows one component to trigger an action in a different unrelated (none parent/child) component.
+- Google OAuth (authentication).
+- JWT interceptor for access/refresh tokens.

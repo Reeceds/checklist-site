@@ -32,16 +32,39 @@
 }
 
 @mixin btn-default {
-  border-radius: 30px;
+  border-radius: 6px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
 
-  &:hover {
-    opacity: 0.7;
-  }
+@mixin reg-btn-1 {
+  @include btn-default;
+  background-color: $color-6;
+  padding: 0.4rem 1.6rem;
+  border: 1px solid $color-6;
+  transition: color 0.5s ease-in-out;
+}
+
+@mixin reg-btn-1-hover {
+  background-color: unset;
+  color: $text-color-3;
+}
+
+@mixin reg-btn-2 {
+  @include btn-default;
+  background-color: unset;
+  padding: 0.4rem 1.6rem;
+  color: $text-color-1;
+  border: 1px solid $color-5;
+  transition: color 0.5s ease-in-out;
+}
+
+@mixin reg-btn-2-hover {
+  background-color: $color-5;
+  color: $text-color-2;
 }
 
 @mixin text-input {
@@ -51,8 +74,7 @@
   border: none;
   border-bottom: 2px solid $color-5;
   background-color: unset;
-  color: $color-5;
-
+  color: $text-color-1;
   &:focus {
     outline: none;
   }

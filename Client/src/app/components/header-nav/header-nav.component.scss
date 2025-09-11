@@ -11,6 +11,12 @@ nav {
   }
 }
 
+.header-container {
+  display: flex;
+  padding: 0 35px;
+  width: 80vw;
+}
+
 .navbar-brand {
   font-weight: 600 !important;
   color: $text-color-1 !important;
@@ -23,8 +29,7 @@ nav {
     font-weight: 600;
 
     &:hover {
-      color: $text-color-1 !important;
-      background-color: $color-3;
+      background-color: $color-4;
       cursor: pointer;
     }
 
@@ -38,7 +43,8 @@ nav {
 .navbar-nav {
   .nav-link {
     font-weight: 600;
-    color: $color-5;
+    color: $text-color-1;
+    cursor: pointer;
 
     &.active {
       color: $text-color-3;

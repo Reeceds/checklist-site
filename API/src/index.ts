@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config(); // ! Set environment variables globally avaialable
+dotenv.config(); //! Set environment variables globally avaialable
 import https from "https";
 import fs from "fs";
 import path from "path";
@@ -16,7 +16,7 @@ import userRoutes from "./routes/userRoutes";
 const app: express.Application = express();
 const port: number = 3000;
 
-// ! Use options and server for https certificate during development
+//! Use options and server for https certificate during development
 const options = {
     key: fs.readFileSync(path.join(__dirname, "../ssl/localhost-key.pem")),
     cert: fs.readFileSync(path.join(__dirname, "../ssl/localhost.pem")),

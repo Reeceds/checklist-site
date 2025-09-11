@@ -1,11 +1,4 @@
-import {
-  Component,
-  DestroyRef,
-  inject,
-  OnInit,
-  Output,
-  output,
-} from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import {
   NavigationEnd,
   Router,
@@ -24,6 +17,9 @@ import {
 } from '@angular/forms';
 import { ModalComponent } from '../modal/modal.component';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faPenToSquare, faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { EventTriggerService } from '../../services/event-trigger.service';
 
 @Component({
   selector: 'app-side-nav',
@@ -33,6 +29,7 @@ import { CommonModule } from '@angular/common';
     ModalComponent,
     ReactiveFormsModule,
     CommonModule,
+    FontAwesomeModule,
   ],
   templateUrl: './side-nav.component.html',
   styleUrl: './side-nav.component.scss',
@@ -40,6 +37,9 @@ import { CommonModule } from '@angular/common';
 export class SideNavComponent implements OnInit {
   destroyRef = inject(DestroyRef);
   fb = inject(NonNullableFormBuilder);
+
+  faPenToSquare = faPenToSquare;
+  faEllipsis = faEllipsis;
 
   checklistData: Checklist[] | undefined;
 
@@ -61,7 +61,8 @@ export class SideNavComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private checklistService: ChecklistService
+    private checklistService: ChecklistService,
+    private eventTriggerService: EventTriggerService
   ) {}
 
   ngOnInit() {
@@ -92,6 +93,14 @@ export class SideNavComponent implements OnInit {
           this.getChecklists();
         }
       });
+
+    this.eventTriggerService.event$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        if (res === 'refreshChecklistData') {
+          this.getChecklists();
+        }
+      });
   }
 
   createChecklistForm = this.fb.group({
@@ -112,9 +121,16 @@ export class SideNavComponent implements OnInit {
           this.checklistData = res;
 
           if (this.checklistData && this.checklistData.length > 0) {
-            this.router.navigate([
-              `/app/checklist/${this.checklistData[0].id}`,
-            ]);
+            // On page refresh. If no item id in url then load the first item in the arr, OR if there is id then do nothing to the url
+            const urlParamId = Number(this.router.url.split('checklist/')[1]);
+            const checklistExists = this.checklistData.find(
+              (el) => el.id === urlParamId
+            );
+            if (isNaN(urlParamId) || !checklistExists) {
+              this.router.navigate([
+                `/app/checklist/${this.checklistData[0].id}`,
+              ]);
+            }
           } else {
             this.router.navigate([`/app/checklist/`]);
           }
@@ -194,6 +210,7 @@ export class SideNavComponent implements OnInit {
         next: (res) => {
           this.getChecklists();
           this.closeModal();
+          this.router.navigate([`/app/checklist/${res.id}`]);
         },
         error: (err) => {
           this.serverError = true;
@@ -234,9 +251,10 @@ export class SideNavComponent implements OnInit {
       .editChecklist(editedChecklist, Number(editedValue.id))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => {
+        next: (_) => {
           this.getChecklists();
           this.closeModal();
+          this.eventTriggerService.trigger('refreshChecklistData');
         },
         error: (err) => {
           this.serverError = true;
@@ -246,12 +264,11 @@ export class SideNavComponent implements OnInit {
   }
 
   deleteChecklistSubmit(id: number) {
-    console.log(this.checklistData);
     this.checklistService
       .deleteChecklist(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res) => {
+        next: (_) => {
           this.getChecklists();
           this.closeModal();
         },

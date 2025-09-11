@@ -85,6 +85,13 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             );
         }
 
+        // UPDATE checklist dateModified
+        await db.run(
+            "UPDATE checklist SET dateModified = CURRENT_TIMESTAMP WHERE id = ? AND userId = ?",
+            checklistId,
+            userId
+        );
+
         res.status(201).json({ message: "Success" });
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err });

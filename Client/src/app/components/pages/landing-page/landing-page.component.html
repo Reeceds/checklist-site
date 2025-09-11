@@ -1,15 +1,23 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" routerLink="/">Checklist App</a>
+    <a class="navbar-brand" routerLink="/">Checklist</a>
   </div>
 </nav>
 
 <div class="container page-container">
-  <div>
-    <h1 style="color: white">Google sign in</h1>
-    <p>Sign in to create dynamic checklists</p>
-    <div class="google-btn-container">
-      <app-google-login />
+  <div class="content-container">
+    <div class="icon-container">
+      <img
+        class="check-icon"
+        src="assets/images/check-icon.svg"
+        alt="Checkmark icon"
+      />
+    </div>
+    <div class="text-btn-container">
+      <p>Sign in here to create dynamic checklists</p>
+      <div class="google-btn-container">
+        <app-google-login />
+      </div>
     </div>
   </div>
 </div>

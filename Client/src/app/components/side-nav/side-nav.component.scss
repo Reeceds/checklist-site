@@ -1,0 +1,144 @@
+@import "../../../styles.scss";
+@import "../../../partials/variables";
+
+.sidebar-container {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  .profile-container {
+    margin-top: 6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  .create-checklist-btn {
+    cursor: pointer;
+    padding-right: 15px;
+    margin-bottom: 4rem;
+
+    &:hover {
+      color: $color-6;
+    }
+  }
+
+  .checklist-container {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  .item-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    max-height: 100%;
+    max-height: 80vh;
+    overflow-y: scroll;
+  }
+
+  .active-item {
+    background-color: $color-3;
+  }
+
+  .item-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 200px;
+    padding: 12px 15px;
+    color: $text-color-1;
+    text-decoration: none;
+    border-radius: 12px;
+  }
+
+  .item-name {
+    // max-width: 130px;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .item-edit-section {
+    border: 2px solid $color-4;
+    min-height: 20px;
+    min-width: 20px;
+    height: 20px;
+    width: 20px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    cursor: pointer;
+    display: none;
+    margin-left: 10px;
+
+    &:hover {
+      color: $color-6;
+      border-color: $color-6;
+    }
+  }
+
+  .item-container:hover .item-edit-section {
+    display: flex;
+  }
+
+  .dropdown-menu {
+    max-width: 50px !important;
+  }
+
+  .dropdown-menu a {
+    color: $text-color-2 !important;
+  }
+
+  .dropdown-item {
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    &:hover {
+      background-color: $color-4;
+    }
+  }
+}
+
+.modal-text {
+  margin-bottom: 2rem;
+}
+
+.modal-text-input {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  width: 100%;
+  @include text-input;
+}
+
+.modal-cancel-btn {
+  @include reg-btn-2;
+  margin-right: 25px;
+
+  &:hover {
+    @include reg-btn-2-hover;
+    margin-right: 25px;
+  }
+}
+
+.modal-submit-btn {
+  @include reg-btn-1;
+
+  &:hover {
+    @include reg-btn-1-hover;
+  }
+}
