@@ -3,6 +3,7 @@ import { LandingPageComponent } from './components/pages/landing-page/landing-pa
 import { ChecklistPageComponent } from './components/pages/checklist-page/checklist-page.component';
 import { ProfilePageComponent } from './components/pages/profile-page/profile-page.component';
 import { MainPageComponent } from './components/pages/main-page/main-page.component';
+import { PendingChangesGuard } from './guards/pending-changes.guard';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,7 @@ export const routes: Routes = [
         path: 'checklist/:id',
         component: ChecklistPageComponent,
         title: 'checklist Page',
+        canDeactivate: [PendingChangesGuard],
       },
       {
         path: 'checklist',

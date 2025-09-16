@@ -71,3 +71,4 @@ Package Manager: npm 10.9.2
 - EventTriggerService. This allows one component to trigger an action in a different unrelated (none parent/child) component.
 - Google OAuth (authentication).
 - JWT interceptor for access/refresh tokens.
+- CanComponentDeactivate routeguard which is triggered when a user attempts to navigate to a different route without saving checklist item changes. Includes files: can-component-deactivate.interface.ts, pending-changes.guard.ts, app.routes.ts, checklist-page.component.ts

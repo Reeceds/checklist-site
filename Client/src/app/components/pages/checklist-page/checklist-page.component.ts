@@ -1,13 +1,6 @@
-import {
-  Component,
-  DestroyRef,
-  inject,
-  input,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ChecklistService } from '../../../services/checklist.service';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Checklist } from '../../../models/checklist';
 import { InputSaveComponent } from '../../input-save/input-save.component';
@@ -22,7 +15,6 @@ import {
   moveItemInArray,
   CdkDragHandle,
 } from '@angular/cdk/drag-drop';
-import { ModalComponent } from '../../modal/modal.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faGripLines,
@@ -33,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ToastrService } from 'ngx-toastr';
 import { EventTriggerService } from '../../../services/event-trigger.service';
+import { CanComponentDeactivate } from '../../../guards/can-component-deactivate.interface';
 
 @Component({
   selector: 'app-checklist-page',
@@ -50,7 +43,7 @@ import { EventTriggerService } from '../../../services/event-trigger.service';
   templateUrl: './checklist-page.component.html',
   styleUrl: './checklist-page.component.scss',
 })
-export class ChecklistPageComponent implements OnInit {
+export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   faGripLines = faGripLines;
   faTrash = faTrash;
   faTrashCan = faTrashCan;
@@ -58,6 +51,8 @@ export class ChecklistPageComponent implements OnInit {
   destroyRef = inject(DestroyRef);
 
   checklist: Checklist | undefined;
+  staticCheckedItems: ChecklistItem[] | undefined = [];
+  staticUncheckedItems: ChecklistItem[] | undefined = [];
   checkedItems: ChecklistItem[] | undefined = [];
   uncheckedItems: ChecklistItem[] | undefined = [];
 
@@ -78,7 +73,8 @@ export class ChecklistPageComponent implements OnInit {
   ngOnInit(): void {
     this.getChecklistById();
 
-    this.eventTriggerService.event$
+    // Causes the title to update when editied in 'side-nav' component
+    this.eventTriggerService.titleEvent$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         if (res === 'refreshChecklistData') {
@@ -115,6 +111,13 @@ export class ChecklistPageComponent implements OnInit {
                     ...el,
                     tempId: i,
                   }));
+
+                this.staticCheckedItems = JSON.parse(
+                  JSON.stringify(this.checkedItems)
+                );
+                this.staticUncheckedItems = JSON.parse(
+                  JSON.stringify(this.uncheckedItems)
+                );
               }
             },
             error: (err) => console.log('Failed to get checklist: ', err),
@@ -242,7 +245,7 @@ export class ChecklistPageComponent implements OnInit {
           this.toastr.success('Saved', '', {
             timeOut: 1000,
           });
-          this.eventTriggerService.trigger('refreshChecklistData');
+          this.eventTriggerService.getTitleTrigger('refreshChecklistData');
         },
         error: (err) => {
           this.toastr.error('Error');
@@ -261,5 +264,22 @@ export class ChecklistPageComponent implements OnInit {
     this.uncheckedItems!.map((el, i) => {
       el.position = i + 1;
     });
+  }
+
+  canDeactivate(): boolean {
+    const isCheckedEqual =
+      JSON.stringify(this.staticCheckedItems) ===
+      JSON.stringify(this.checkedItems);
+    const isUncheckedEqual =
+      JSON.stringify(this.staticUncheckedItems) ===
+      JSON.stringify(this.uncheckedItems);
+
+    if (!isCheckedEqual || !isUncheckedEqual) {
+      this.eventTriggerService.closeModalTrigger('closeModal');
+      return confirm(
+        'You have unsaved changes. Do you really want to leave this page?'
+      );
+    }
+    return true;
   }
 }

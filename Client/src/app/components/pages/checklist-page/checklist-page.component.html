@@ -5,16 +5,18 @@
   uncheckedItems.length > 0) {
   <ul
     cdkDropList
-    class="example-list checklist-items-container"
+    class="draggable-list unchecklist-items-container"
     (cdkDropListDropped)="drop($event)"
   >
     @for (item of uncheckedItems; track item.tempId) {
     <li class="checklist-item" cdkDrag>
-      <fa-icon
-        class="fa-xl position-icon"
-        [icon]="faGripLines"
-        cdkDragHandle
-      ></fa-icon>
+      <div class="position-icon-container">
+        <fa-icon
+          class="fa-xl position-icon"
+          [icon]="faGripLines"
+          cdkDragHandle
+        ></fa-icon>
+      </div>
       <label class="checkbox-container">
         <input
           aria-label="Checkbox"
@@ -45,7 +47,7 @@
     }
   </ul>
   } @if (checkedItems && checkedItems.length > 0) {
-  <ul class="">
+  <ul class="checklist-items-container">
     @for (item of checkedItems; track item.tempId) {
     <li class="checklist-item">
       <label class="checkbox-container">

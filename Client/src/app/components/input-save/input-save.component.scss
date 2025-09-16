@@ -33,10 +33,11 @@
   position: relative;
   right: 25px;
   cursor: pointer;
-}
+  transition: color 0.25s ease-in-out;
 
-.submit-item-btn:hover {
-  color: $text-color-1;
+  &:hover {
+    color: $text-color-1;
+  }
 }
 
 .save-checklist-btn {

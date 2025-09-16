@@ -4,7 +4,7 @@ textarea {
   caret-color: $color-4 !important;
 }
 
-.example-list {
+.draggable-list {
   width: 500px;
   max-width: 100%;
   border: solid 1px #ccc;
@@ -13,21 +13,6 @@ textarea {
   background: white;
   border-radius: 4px;
   overflow: hidden;
-  font-family: sans-serif;
-}
-
-.example-box {
-  padding: 20px 10px;
-  border-bottom: solid 1px #ccc;
-  color: rgba(0, 0, 0, 0.87);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  cursor: move;
-  background: white;
-  font-size: 14px;
   font-family: sans-serif;
 }
 
@@ -46,6 +31,10 @@ textarea {
 }
 
 .checklist-items-container {
+  padding-left: 30px;
+}
+
+.unchecklist-items-container {
   width: 100%;
   border: unset;
   background-color: unset;
@@ -59,10 +48,13 @@ textarea {
   background-color: $color-1;
 }
 
+.position-icon-container {
+  min-width: 30px;
+}
+
 .position-icon {
   cursor: grab;
   color: $color-3;
-  margin-right: 15px;
   transition: color 0.25s ease-in-out;
 
   &:hover {

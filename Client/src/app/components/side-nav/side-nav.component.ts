@@ -94,11 +94,21 @@ export class SideNavComponent implements OnInit {
         }
       });
 
-    this.eventTriggerService.event$
+    // Moves checklist to top of the side panel list wnen its checklist items are modified in 'checklist-page' component
+    this.eventTriggerService.titleEvent$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
         if (res === 'refreshChecklistData') {
           this.getChecklists();
+        }
+      });
+
+    // Stops the edit/remove modal from appearing if checklist has unsaved changes and user tries to edit/delete a checklist in 'checklist-page' component
+    this.eventTriggerService.modalEvent$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        if (res === 'closeModal') {
+          this.closeModal();
         }
       });
   }
@@ -254,7 +264,7 @@ export class SideNavComponent implements OnInit {
         next: (_) => {
           this.getChecklists();
           this.closeModal();
-          this.eventTriggerService.trigger('refreshChecklistData');
+          this.eventTriggerService.getTitleTrigger('refreshChecklistData');
         },
         error: (err) => {
           this.serverError = true;

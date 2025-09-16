@@ -23,6 +23,7 @@
     cursor: pointer;
     padding-right: 15px;
     margin-bottom: 4rem;
+    transition: color 0.25s ease-in-out;
 
     &:hover {
       color: $color-6;
