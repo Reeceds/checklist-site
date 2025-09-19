@@ -24,5 +24,9 @@
     background-color: $color-2;
     z-index: 11;
     border-radius: 20px;
+
+    @include xs-display {
+      width: 90vw;
+    }
   }
 }

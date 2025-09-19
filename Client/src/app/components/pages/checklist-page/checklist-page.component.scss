@@ -1,4 +1,5 @@
 @import "../../../../partials/variables";
+@import "../../../../partials/mixins";
 
 textarea {
   caret-color: $color-4 !important;
@@ -154,4 +155,18 @@ textarea {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+@include md-display {
+  .checklist-page {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+
+@include sm-display {
+  .checklist-page {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }

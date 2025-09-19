@@ -58,9 +58,6 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
 
   paramId: number | undefined;
 
-  textValue = localStorage.getItem('textareaValue') || '';
-  savedHeight = Number(localStorage.getItem('textareaHeight')) || null;
-
   constructor(
     private checklistService: ChecklistService,
     private route: ActivatedRoute,

@@ -1,5 +1,6 @@
 @import "../../../styles.scss";
 @import "../../../partials/variables";
+@import "../../../partials/mixins";
 
 .sidebar-container {
   padding-right: 20px;
@@ -141,5 +142,11 @@
 
   &:hover {
     @include reg-btn-1-hover;
+  }
+}
+
+@include sm-display {
+  .checklist-container-collapsed {
+    visibility: hidden;
   }
 }

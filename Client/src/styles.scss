@@ -66,6 +66,12 @@ body {
   width: 80vw;
 }
 
+@include sm-display {
+  .input-save-component {
+    width: 95vw;
+  }
+}
+
 // MATERIAL DRAG/DROP STYLES
 .cdk-drag-preview {
   border: none;
@@ -144,4 +150,10 @@ body {
 
 .toast-success {
   background-color: $color-6;
+}
+
+@include md-display {
+  .page-container {
+    padding-top: 1.5rem;
+  }
 }

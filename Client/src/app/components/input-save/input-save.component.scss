@@ -48,3 +48,15 @@
     @include reg-btn-1-hover;
   }
 }
+
+@include md-display {
+  .item-input-section {
+    padding: 25px;
+  }
+}
+
+@include sm-display {
+  .item-input-section {
+    padding: 15px;
+  }
+}

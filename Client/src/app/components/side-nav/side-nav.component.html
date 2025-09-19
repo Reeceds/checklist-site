@@ -10,7 +10,10 @@
   </div>
 
   } @if (isChecklistNav) {
-  <div class="checklist-container">
+  <div
+    class="checklist-container"
+    [class.checklist-container-collapsed]="!isSidePanelExpandedVal"
+  >
     @if (checklistData && checklistData.length > 0) {
     <fa-icon
       class="fa-lg create-checklist-btn"

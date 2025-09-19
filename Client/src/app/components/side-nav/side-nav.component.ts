@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
 import {
   NavigationEnd,
   Router,
@@ -35,6 +35,8 @@ import { EventTriggerService } from '../../services/event-trigger.service';
   styleUrl: './side-nav.component.scss',
 })
 export class SideNavComponent implements OnInit {
+  @Input() isSidePanelExpandedVal!: boolean;
+
   destroyRef = inject(DestroyRef);
   fb = inject(NonNullableFormBuilder);
 

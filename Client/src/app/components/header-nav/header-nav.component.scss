@@ -1,8 +1,9 @@
 @import "../../../partials/variables";
 @import "../../../partials/typography";
+@import "../../../partials/mixins";
 
 nav {
-  width: 80vw;
+  // width: 80vw;
   background-color: $color-1 !important;
   border-bottom: 1px solid $color-3;
 
@@ -41,6 +42,8 @@ nav {
 }
 
 .navbar-nav {
+  padding-left: 20px;
+
   .nav-link {
     font-weight: 600;
     color: $text-color-1;
@@ -53,5 +56,18 @@ nav {
     &:hover {
       color: $text-color-3;
     }
+  }
+}
+
+@include md-display {
+  .header-container {
+    padding: 0 25px;
+  }
+}
+
+@include sm-display {
+  .header-container {
+    width: 95vw;
+    padding: 0 15px;
   }
 }

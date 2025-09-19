@@ -1,9 +1,21 @@
 <div class="app-container">
-  <section class="side-panel">
-    <app-side-nav />
+  <div [class.overlay]="isSidePanelExpanded" (click)="closeSidePanel()"></div>
+  <section
+    class="left-side-panel"
+    [class.left-side-panel-collapsed]="!isSidePanelExpanded"
+    [class.left-side-panel-expanded]="isSidePanelExpanded"
+  >
+    <app-side-nav [isSidePanelExpandedVal]="isSidePanelExpanded" />
+    <div class="toggle-container" (click)="toggleSidePanel()">
+      <fa-icon
+        #chevron
+        class="fa-md toggle-icon"
+        [icon]="faChevronIcon"
+      ></fa-icon>
+    </div>
   </section>
 
-  <section>
+  <section class="right-body">
     <app-header-nav />
     <router-outlet />
   </section>
