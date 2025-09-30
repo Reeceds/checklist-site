@@ -49,6 +49,12 @@ textarea {
   background-color: $color-1;
 }
 
+.checklist-item:has(.delete-icon:hover) textarea,
+.checklist-item:has(.position-icon:hover) textarea {
+  color: $text-color-3;
+  transition: color 0.25s ease-in-out;
+}
+
 .position-icon-container {
   min-width: 30px;
 }
