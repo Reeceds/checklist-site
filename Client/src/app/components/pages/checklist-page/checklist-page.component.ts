@@ -68,59 +68,60 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   ) {}
 
   ngOnInit(): void {
-    this.getChecklistById();
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.paramId = params['id'];
+        if (this.paramId) {
+          this.getChecklistById(this.paramId);
+        }
+      });
 
     // Causes the title to update when editied in 'side-nav' component
     this.eventTriggerService.titleEvent$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => {
-        if (res === 'refreshChecklistData') {
-          this.getChecklistById();
+        if (res === 'refreshChecklistData' && this.paramId) {
+          this.getChecklistById(this.paramId);
         }
       });
   }
 
-  getChecklistById() {
-    this.route.params.subscribe((params) => {
-      this.paramId = params['id'];
+  getChecklistById(id: number) {
+    this.checklistService
+      .getChecklistById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            this.checklist = res;
+          }
 
-      if (this.paramId) {
-        this.checklistService
-          .getChecklistById(this.paramId)
-          .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: (res) => {
-              if (res) {
-                this.checklist = res;
-              }
+          if (res?.checklistItems) {
+            this.checkedItems = res.checklistItems
+              .filter((e) => e.isChecked === 1)
+              .map((el, i) => ({
+                ...el,
+                tempId: i,
+              }));
 
-              if (res?.checklistItems) {
-                this.checkedItems = res.checklistItems
-                  .filter((e) => e.isChecked === 1)
-                  .map((el, i) => ({
-                    ...el,
-                    tempId: i,
-                  }));
+            this.uncheckedItems = res.checklistItems
+              .filter((e) => e.isChecked === 0)
+              .map((el, i) => ({
+                ...el,
+                tempId: i,
+              }));
 
-                this.uncheckedItems = res.checklistItems
-                  .filter((e) => e.isChecked === 0)
-                  .map((el, i) => ({
-                    ...el,
-                    tempId: i,
-                  }));
-
-                this.staticCheckedItems = JSON.parse(
-                  JSON.stringify(this.checkedItems)
-                );
-                this.staticUncheckedItems = JSON.parse(
-                  JSON.stringify(this.uncheckedItems)
-                );
-              }
-            },
-            error: (err) => console.log('Failed to get checklist: ', err),
-          });
-      }
-    });
+            this.staticCheckedItems = JSON.parse(
+              JSON.stringify(this.checkedItems)
+            );
+            this.staticUncheckedItems = JSON.parse(
+              JSON.stringify(this.uncheckedItems)
+            );
+          }
+        },
+        error: (err) => console.log('Failed to get checklist: ', err),
+      });
   }
 
   onAddItem(item: ChecklistItem) {
