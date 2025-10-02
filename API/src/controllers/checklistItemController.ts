@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
-import { Database } from "sqlite";
-import { connectDB } from "../db";
+import { pool } from "../db";
 import { checklistItem } from "../models/checklistItem";
 import { AuthRequest } from "../middleware/authorize";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 // POST create, update, delete
 export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
 
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
@@ -21,12 +21,12 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             if (invalidData) return res.status(400).json({ message: "Invalid checklist content" });
         }
 
-        const db: Database = await connectDB();
-        const dbItems = await db.all(
+        const [dbItemsData] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ?",
-            checklistId,
-            userId
+            [checklistId, userId]
         );
+
+        const dbItems = dbItemsData as checklistItem[];
 
         if (dbItems.length) {
             // UPDATE
@@ -43,12 +43,9 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             if (updatedItems.length) {
                 await Promise.all(
                     updatedItems.map((e: checklistItem) => {
-                        db.run(
+                        pool.execute<ResultSetHeader>(
                             "UPDATE checklistItem SET content = ?, isChecked = ?, position = ?, dateModified = CURRENT_TIMESTAMP WHERE id = ?",
-                            e.content,
-                            e.isChecked,
-                            e.position,
-                            e.id
+                            [e.content, e.isChecked, e.position, e.id]
                         );
                     })
                 );
@@ -62,7 +59,7 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             await Promise.all(
                 itemsToDelete.map((el: checklistItem) => {
                     if (itemsToDelete) {
-                        db.run("DELETE FROM checklistItem WHERE id = ?", el.id);
+                        pool.execute<ResultSetHeader>("DELETE FROM checklistItem WHERE id = ?", [el.id]);
                     }
                 })
             );
@@ -73,23 +70,18 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
         if (newItems.length) {
             await Promise.all(
                 newItems.map((e: checklistItem) => {
-                    return db.run(
+                    return pool.execute<ResultSetHeader>(
                         "INSERT INTO checklistItem (content, checklistId, isChecked, position, userId) VALUES (?, ?, ?, ?, ?)",
-                        e.content,
-                        checklistId,
-                        e.isChecked ?? 0,
-                        e.position ?? 0,
-                        userId
+                        [e.content, checklistId, e.isChecked ?? 0, e.position ?? 0, userId]
                     );
                 })
             );
         }
 
         // UPDATE checklist dateModified
-        await db.run(
+        await pool.execute<ResultSetHeader>(
             "UPDATE checklist SET dateModified = CURRENT_TIMESTAMP WHERE id = ? AND userId = ?",
-            checklistId,
-            userId
+            [checklistId, userId]
         );
 
         res.status(201).json({ message: "Success" });

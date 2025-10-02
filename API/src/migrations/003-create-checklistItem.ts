@@ -1,21 +1,46 @@
-import { MigrationFn } from "umzug";
-import { Database } from "sqlite";
+import { DataTypes, QueryInterface } from "sequelize";
 
-export const up: MigrationFn<Database> = async ({ context: db }) => {
-    await db.exec(`
-    CREATE TABLE IF NOT EXISTS checklistItem (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      content TEXT NOT NULL,
-      isChecked NUMBER NOT NULL,
-      position INTEGER NOT NULL,
-      dateModified DATETIME DEFAULT CURRENT_TIMESTAMP,
-      userId INTEGER NOT NULL,
-      checklistId INTEGER NOT NULL,
-      FOREIGN KEY (checklistId) REFERENCES checklist(id) ON DELETE CASCADE
-    );
-  `);
-};
+export async function up({ context: queryInterface }: { context: QueryInterface }) {
+    await queryInterface.createTable("checklistItem", {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        content: {
+            type: DataTypes.STRING(500),
+            allowNull: false,
+        },
+        isChecked: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
+        position: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        dateModified: {
+            type: "DATETIME",
+            defaultValue: queryInterface.sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            // You could also add a references here if you want checklistItem → user relation
+        },
+        checklistId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "checklist", // 👈 must match the actual table name
+                key: "id",
+            },
+            onDelete: "CASCADE",
+        },
+    });
+}
 
-export const down: MigrationFn<Database> = async ({ context: db }) => {
-    await db.exec(`DROP TABLE IF EXISTS checklistItem`);
-};
+export async function down({ context: queryInterface }: { context: QueryInterface }) {
+    await queryInterface.dropTable("checklistItem");
+}

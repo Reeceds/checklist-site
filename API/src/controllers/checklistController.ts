@@ -1,24 +1,24 @@
 import { Request, Response } from "express";
-import { connectDB } from "../db";
-import { Database } from "sqlite";
+import { pool } from "../db";
 import { Checklist } from "../models/checklist";
 import { AuthRequest } from "../middleware/authorize";
 import { checklistItem } from "../models/checklistItem";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 // GET all
 export const getChecklists = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
-        const db: Database = await connectDB();
-
-        const checklists: Checklist[] = await db.all(
+        const [checklistsData] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM checklist WHERE userId = ? ORDER BY dateModified DESC",
-            userId
+            [userId]
         );
+
+        const checklists = checklistsData as Checklist[];
 
         res.status(200).json(checklists);
     } catch (err) {
@@ -30,7 +30,7 @@ export const getChecklists = async (req: AuthRequest, res: Response) => {
 export const getChecklistById = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
@@ -40,17 +40,19 @@ export const getChecklistById = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid ID" });
         }
 
-        const db: Database = await connectDB();
-        const checklist: Checklist | undefined = await db.get(
+        const [checklistData] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM checklist WHERE id = ? AND userId = ?",
-            id,
-            userId
+            [id, userId]
         );
-        const checklistItems = await db.all(
+
+        const checklist = checklistData[0] as Checklist;
+
+        const [checklistItemData] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ? ORDER BY position ASC;",
-            id,
-            userId
+            [id, userId]
         );
+
+        const checklistItems = checklistItemData as checklistItem[];
 
         if (!checklist) {
             return res.status(404).json({ message: "Item not found" });
@@ -71,7 +73,7 @@ export const getChecklistById = async (req: AuthRequest, res: Response) => {
 export const createChecklist = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
@@ -81,10 +83,12 @@ export const createChecklist = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid item data. Please enter a title." });
         }
 
-        const db: Database = await connectDB();
-        const result = await db.run("INSERT INTO checklist (title, userId) VALUES (?, ?);", title, userId);
+        const [resultData] = await pool.execute<ResultSetHeader>(
+            "INSERT INTO checklist (title, userId) VALUES (?, ?);",
+            [title, userId]
+        );
 
-        res.status(201).json({ id: result.lastID, title });
+        res.status(201).json({ id: resultData.insertId, title });
     } catch (err) {
         res.status(500).json({ message: "Error creating item", error: err });
     }
@@ -94,7 +98,7 @@ export const createChecklist = async (req: AuthRequest, res: Response) => {
 export const updateChecklist = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
@@ -109,24 +113,23 @@ export const updateChecklist = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid item data. Please enter a title." });
         }
 
-        const db: Database = await connectDB();
-        const item: Checklist | undefined = await db.get(
+        const [checklistData] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM checklist WHERE id = ? AND userId = ?",
-            id,
-            userId
+            [id, userId]
         );
 
-        if (!item) {
+        const checklist = checklistData[0] as Checklist;
+
+        if (!checklist) {
             return res.status(404).json({ message: "Item not found" });
         }
 
-        const result = await db.run(
+        const [resultData] = await pool.execute<ResultSetHeader>(
             "UPDATE checklist SET title = ?, dateModified = CURRENT_TIMESTAMP WHERE id = ?",
-            title,
-            id
+            [title, id]
         );
 
-        res.status(200).json({ message: "Checklist item updated", id: result.lastID, title });
+        res.status(200).json({ message: "Checklist item updated", id: resultData.insertId, title });
     } catch (err) {
         res.status(500).json({ message: "Error updating item", error: err });
     }
@@ -136,7 +139,7 @@ export const updateChecklist = async (req: AuthRequest, res: Response) => {
 export const deleteChecklist = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
@@ -145,18 +148,18 @@ export const deleteChecklist = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid ID" });
         }
 
-        const db: Database = await connectDB();
-        const item: Checklist | undefined = await db.get(
+        const [checklistItem] = await pool.query<RowDataPacket[]>(
             "SELECT * FROM checklist WHERE id = ? AND userId = ?",
-            id,
-            userId
+            [id, userId]
         );
 
-        if (!item) {
+        const checklist = checklistItem[0] as Checklist;
+
+        if (!checklist) {
             return res.status(404).json({ message: "Item not found" });
         }
 
-        await db.run("DELETE FROM checklist WHERE id = ? AND userId = ?", id, userId);
+        await pool.execute<ResultSetHeader>("DELETE FROM checklist WHERE id = ? AND userId = ?", [id, userId]);
 
         res.status(200).json({ message: "Item successfully removed", id });
     } catch (err) {

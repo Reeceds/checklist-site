@@ -1,17 +1,14 @@
-import { MigrationFn } from "umzug";
-import { Database } from "sqlite";
+import { DataTypes, QueryInterface } from "sequelize";
 
-export const up: MigrationFn<Database> = async ({ context: db }) => {
-    await db.exec(`
-    CREATE TABLE IF NOT EXISTS user (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL UNIQUE,
-      dateModified DATETIME DEFAULT CURRENT_TIMESTAMP,
-      refreshToken TEXT
-    );
-  `);
-};
+export async function up({ context: queryInterface }: { context: QueryInterface }) {
+    await queryInterface.createTable("user", {
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+        email: { type: DataTypes.STRING, allowNull: false, unique: true },
+        dateModified: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+        refreshToken: { type: DataTypes.TEXT },
+    });
+}
 
-export const down: MigrationFn<Database> = async ({ context: db }) => {
-    await db.exec(`DROP TABLE IF EXISTS user`);
-};
+export async function down({ context: queryInterface }: { context: QueryInterface }) {
+    await queryInterface.dropTable("user");
+}

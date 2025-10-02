@@ -1,18 +1,32 @@
-import { MigrationFn } from "umzug";
-import { Database } from "sqlite";
+import { DataTypes, QueryInterface } from "sequelize";
 
-export const up: MigrationFn<Database> = async ({ context: db }) => {
-    await db.exec(`
-    CREATE TABLE IF NOT EXISTS checklist (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      dateModified DATETIME DEFAULT CURRENT_TIMESTAMP,
-      userId INTEGER NOT NULL,
-      FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
-    );
-  `);
-};
+export async function up({ context: queryInterface }: { context: QueryInterface }) {
+    await queryInterface.createTable("checklist", {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        title: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+        },
+        dateModified: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "user", // 👈 should match the table name for your user table
+                key: "id",
+            },
+            onDelete: "CASCADE",
+        },
+    });
+}
 
-export const down: MigrationFn<Database> = async ({ context: db }) => {
-    await db.exec(`DROP TABLE IF EXISTS checklist`);
-};
+export async function down({ context: queryInterface }: { context: QueryInterface }) {
+    await queryInterface.dropTable("checklist");
+}

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output
+dist
+build
+
+# Logs
+*.log
+
+# Git
+.git
+.gitignore
+
+# Env/config
+.env
+*.local
+
+# OS/editor junk
+.DS_Store
+*.swp

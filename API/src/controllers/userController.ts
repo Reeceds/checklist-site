@@ -1,17 +1,19 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/authorize";
-import { Database } from "sqlite";
-import { connectDB } from "../db";
+import { pool } from "../db";
+import { RowDataPacket } from "mysql2";
+import { User } from "../models/user";
 
 export const getCurrentUser = async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user.sub;
-        if (userId === null || userId === undefined) {
+        if (!userId) {
             return res.status(401).json("User not found.");
         }
 
-        const db: Database = await connectDB();
-        const currentUser = await db.get("SELECT email FROM user WHERE id = ?", userId);
+        const [userData] = await pool.query<RowDataPacket[]>("SELECT email FROM user WHERE id = ?", [userId]);
+
+        const currentUser = userData[0] as User;
 
         if (!currentUser) {
             return res.status(404).json({ message: "User not found" });
