@@ -8,7 +8,7 @@
     class="draggable-list unchecklist-items-container"
     (cdkDropListDropped)="drop($event)"
   >
-    @for (item of uncheckedItems; track item.tempId) {
+    @for (item of uncheckedItems; track item.temp_id) {
     <li class="checklist-item" cdkDrag>
       <div class="position-icon-container">
         <fa-icon
@@ -22,9 +22,9 @@
           aria-label="Checkbox"
           type="checkbox"
           checked="checked"
-          [checked]="item.isChecked"
-          [(ngModel)]="item.isChecked"
-          (ngModelChange)="onToggleChecked(item.tempId!)"
+          [checked]="item.is_checked"
+          [(ngModel)]="item.is_checked"
+          (ngModelChange)="onToggleChecked(item.temp_id!)"
         />
         <span class="checkmark"></span>
       </label>
@@ -34,30 +34,32 @@
           cdkTextareaAutosize
           #autosize="cdkTextareaAutosize"
           [(ngModel)]="item.content"
-          (ngModelChange)="onEditContent($event, item.tempId!, item.isChecked)"
+          (ngModelChange)="
+            onEditContent($event, item.temp_id!, item.is_checked)
+          "
           aria-label="Checklist item content"
         ></textarea>
       </mat-form-field>
       <fa-icon
         class="fa-md delete-icon"
         [icon]="faTrashCan"
-        (click)="onDeleteItem(item.isChecked, item.tempId!)"
+        (click)="onDeleteItem(item.is_checked, item.temp_id!)"
       ></fa-icon>
     </li>
     }
   </ul>
   } @if (checkedItems && checkedItems.length > 0) {
   <ul class="checklist-items-container">
-    @for (item of checkedItems; track item.tempId) {
+    @for (item of checkedItems; track item.temp_id) {
     <li class="checklist-item">
       <label class="checkbox-container">
         <input
           aria-label="Checkbox"
           type="checkbox"
           checked="checked"
-          [checked]="item.isChecked"
-          [(ngModel)]="item.isChecked"
-          (ngModelChange)="onToggleChecked(item.tempId!)"
+          [checked]="item.is_checked"
+          [(ngModel)]="item.is_checked"
+          (ngModelChange)="onToggleChecked(item.temp_id!)"
         />
         <span class="checkmark"></span>
       </label>
@@ -67,14 +69,16 @@
           cdkTextareaAutosize
           #autosize="cdkTextareaAutosize"
           [(ngModel)]="item.content"
-          (ngModelChange)="onEditContent($event, item.tempId!, item.isChecked)"
+          (ngModelChange)="
+            onEditContent($event, item.temp_id!, item.is_checked)
+          "
           aria-label="Checklist item content"
         ></textarea>
       </mat-form-field>
       <fa-icon
         class="fa-md delete-icon"
         [icon]="faTrashCan"
-        (click)="onDeleteItem(item.isChecked, item.tempId!)"
+        (click)="onDeleteItem(item.is_checked, item.temp_id!)"
       ></fa-icon>
     </li>
     }

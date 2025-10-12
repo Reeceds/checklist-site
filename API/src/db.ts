@@ -1,27 +1,30 @@
-import mysql from "mysql2/promise";
+import { Pool } from "pg";
 
-if (!process.env.MYSQL_HOST || !process.env.MYSQL_USER || !process.env.MYSQL_PASSWORD || !process.env.MYSQL_DATABASE) {
-    throw new Error("Missing required MySQL environment variables");
+if (
+    !process.env.POSTGRES_HOST ||
+    !process.env.POSTGRES_USER ||
+    !process.env.POSTGRES_PASSWORD ||
+    !process.env.POSTGRES_DATABASE
+) {
+    throw new Error("Missing required postgres environment variables");
 }
 
-export const pool = mysql.createPool({
-    host: process.env.MYSQL_HOST || "mysql", // Backend API Docker = "mysql", Backend API Local = "127.0.0.1"
-    user: process.env.MYSQL_USER || "root", // fallback to root user locally
-    password: process.env.MYSQL_PASSWORD || "rootpw", // fallback local password
-    database: process.env.MYSQL_DATABASE || "checklist-mysql-db", // default DB
-    port: Number(process.env.MYSQL_PORT) || 3306,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
+export const pool = new Pool({
+    host: process.env.POSTGRES_HOST || "postgres", // Backend API Docker = "postgres", Backend API Local = "127.0.0.1"
+    user: process.env.POSTGRES_USER || "root", // fallback to root user locally
+    password: process.env.POSTGRES_PASSWORD || "rootpw", // fallback local password
+    database: process.env.POSTGRES_DATABASE || "checklist-postgres-db", // default DB
+    port: Number(process.env.POSTGRES_PORT) || 5432,
+    max: 10,
 });
 
 // Test connection
-pool.getConnection()
+pool.connect()
     .then((conn) => {
-        console.log("MySQL connected");
+        console.log("PostgresSQL connected");
         conn.release();
     })
     .catch((err) => {
-        console.error("MySQL connection failed:", err);
+        console.error("PostgresSQL connection failed:", err);
         process.exit(1);
     });

@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import { pool } from "../db";
 import { User } from "../models/user";
-import { RowDataPacket, ResultSetHeader } from "mysql2";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID!);
 
@@ -22,17 +21,17 @@ export const googleLogin = async (req: Request, res: Response) => {
         }
 
         // Query user
-        const [userData] = await pool.query<RowDataPacket[]>("SELECT * FROM user WHERE email = ?", [payload.email]);
+        const userData = await pool.query<User>("SELECT * FROM users WHERE email = $1", [payload.email]);
 
-        let user: User | undefined = userData.length ? (userData[0] as User) : undefined;
+        let user: User | undefined = userData.rows.length > 0 ? (userData.rows[0] as User) : undefined;
 
         // Create user if not exists
         if (!user) {
-            const [result] = await pool.execute<ResultSetHeader>(
-                "INSERT INTO user (email, dateModified) VALUES (?, CURRENT_TIMESTAMP)",
+            const result = await pool.query<User>(
+                "INSERT INTO users (email, date_modified) VALUES ($1, CURRENT_TIMESTAMP)",
                 [payload.email]
             );
-            user = { id: result.insertId, email: payload.email };
+            user = { id: result.rows[0].id, email: payload.email };
         }
 
         // Generate tokens
@@ -40,7 +39,7 @@ export const googleLogin = async (req: Request, res: Response) => {
         const refreshToken = generateRefreshToken();
 
         // Save refresh token
-        await pool.execute("UPDATE user SET refreshToken = ? WHERE id = ?", [refreshToken, user.id]);
+        await pool.query<User>("UPDATE users SET refresh_token = $1 WHERE id = $2", [refreshToken, user.id]);
 
         // Set refresh token as HttpOnly cookie
         res.cookie("refreshToken", refreshToken, {
@@ -66,22 +65,20 @@ export const refreshToken = async (req: Request, res: Response) => {
         }
 
         // Fetch user by refresh token
-        const [userData] = await pool.query<RowDataPacket[]>("SELECT * FROM user WHERE refreshToken = ?", [
-            currentToken,
-        ]);
+        const userData = await pool.query<User>("SELECT * FROM users WHERE refresh_token = $1", [currentToken]);
 
-        if (userData.length === 0) {
+        if (userData.rows.length === 0) {
             return res.status(400).json({ message: "User does not exist with this token" });
         }
 
-        const user = userData[0] as User;
+        const user: User = userData.rows[0];
 
         // Generate new tokens
         const newAccessToken = generateAccessToken(user.id);
         const newRefreshToken = generateRefreshToken();
 
         // Save new refresh token
-        await pool.execute("UPDATE user SET refreshToken = ? WHERE id = ?", [newRefreshToken, user.id]);
+        await pool.query("UPDATE users SET refresh_token = $1 WHERE id = $2", [newRefreshToken, user.id]);
 
         // Set refresh token as HttpOnly cookie
         res.cookie("refreshToken", newRefreshToken, {

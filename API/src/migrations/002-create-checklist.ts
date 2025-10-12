@@ -11,15 +11,16 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
             type: DataTypes.STRING(255),
             allowNull: false,
         },
-        dateModified: {
+        date_modified: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
+            allowNull: false,
         },
-        userId: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: "user", // 👈 should match the table name for your user table
+                model: "users", // 👈 should match the table name for your users table
                 key: "id",
             },
             onDelete: "CASCADE",

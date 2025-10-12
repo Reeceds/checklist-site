@@ -16,7 +16,7 @@
 
 # Commands
 
-`docker compose up -d mysql`:
+`docker compose up -d postgres`:
 
 -   Create/start docker MySQL container witht this command.
 -   Run this command in the same directory as the 'docker-compose.yml' file.
@@ -31,12 +31,12 @@
 -   stops/removes all containers created by 'docker compose up' and deletes the database data.
 -   Run this command in the same directory as the 'docker-compose.yml' file.
 
-##### MySQL - MySQL VSCode extension db connection
+##### Postgres - Database VSCode extension db connection
 
 # Add new connection
 
--   Host: 127.0.0.1 for API running locally, "mysql" for API running in Docker.
--   Port: 3307 or 'MYSQL_PORT' value set in 'docker-compose.yml' / '.env'.
--   Username: MySQL account username.
--   Password: 'MYSQL_PASSWORD' value set in 'docker-compose.yml' / '.env'.
--   Database: 'MYSQL_DATABASE' value set in 'docker-compose.yml' / '.env'.
+-   Host: 127.0.0.1 for API running locally, "postgres" for API running in Docker.
+-   Port: 3307 or 'POSTGRES_PORT' value set in 'docker-compose.yml' / '.env'.
+-   Username: 'POSTGRES_USER' value set in 'docker-compose.yml' / '.env'.
+-   Password: 'POSTGRES_PASSWORD' value set in 'docker-compose.yml' / '.env'.
+-   Database: 'POSTGRES_DATABASE' value set in 'docker-compose.yml' / '.env'.

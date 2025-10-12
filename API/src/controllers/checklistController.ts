@@ -3,7 +3,6 @@ import { pool } from "../db";
 import { Checklist } from "../models/checklist";
 import { AuthRequest } from "../middleware/authorize";
 import { checklistItem } from "../models/checklistItem";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 // GET all
 export const getChecklists = async (req: AuthRequest, res: Response) => {
@@ -13,14 +12,12 @@ export const getChecklists = async (req: AuthRequest, res: Response) => {
             return res.status(401).json("User not found.");
         }
 
-        const [checklistsData] = await pool.query<RowDataPacket[]>(
-            "SELECT * FROM checklist WHERE userId = ? ORDER BY dateModified DESC",
+        const checklistsData = await pool.query<Checklist>(
+            "SELECT * FROM checklist WHERE user_id = $1 ORDER BY date_modified DESC",
             [userId]
         );
 
-        const checklists = checklistsData as Checklist[];
-
-        res.status(200).json(checklists);
+        res.status(200).json(checklistsData.rows);
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err });
     }
@@ -40,27 +37,23 @@ export const getChecklistById = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid ID" });
         }
 
-        const [checklistData] = await pool.query<RowDataPacket[]>(
-            "SELECT * FROM checklist WHERE id = ? AND userId = ?",
-            [id, userId]
-        );
+        const checklistData = await pool.query<Checklist>("SELECT * FROM checklist WHERE id = $1 AND user_id = $2", [
+            id,
+            userId,
+        ]);
 
-        const checklist = checklistData[0] as Checklist;
-
-        const [checklistItemData] = await pool.query<RowDataPacket[]>(
-            "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ? ORDER BY position ASC;",
-            [id, userId]
-        );
-
-        const checklistItems = checklistItemData as checklistItem[];
-
-        if (!checklist) {
+        if (checklistData.rows.length === 0) {
             return res.status(404).json({ message: "Item not found" });
         }
 
+        const checklistItemData = await pool.query<checklistItem>(
+            "SELECT * FROM checklist_item WHERE checklist_id = $1 AND user_id = $2 ORDER BY position ASC;",
+            [id, userId]
+        );
+
         const checklistResult: Checklist = {
-            ...checklist,
-            checklistItems: checklistItems,
+            ...checklistData.rows[0],
+            checklist_items: checklistItemData.rows,
         };
 
         res.status(200).json(checklistResult);
@@ -83,12 +76,12 @@ export const createChecklist = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid item data. Please enter a title." });
         }
 
-        const [resultData] = await pool.execute<ResultSetHeader>(
-            "INSERT INTO checklist (title, userId) VALUES (?, ?);",
+        const resultData = await pool.query<Checklist>(
+            "INSERT INTO checklist (title, user_id, date_modified) VALUES ($1, $2, CURRENT_TIMESTAMP) RETURNING id;",
             [title, userId]
-        );
+        ); //! 'RETURNING id' return the id for the insreted row, used in res.status() below
 
-        res.status(201).json({ id: resultData.insertId, title });
+        res.status(201).json({ id: resultData.rows[0].id, title });
     } catch (err) {
         res.status(500).json({ message: "Error creating item", error: err });
     }
@@ -113,23 +106,21 @@ export const updateChecklist = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid item data. Please enter a title." });
         }
 
-        const [checklistData] = await pool.query<RowDataPacket[]>(
-            "SELECT * FROM checklist WHERE id = ? AND userId = ?",
-            [id, userId]
-        );
+        const checklistData = await pool.query<Checklist>("SELECT * FROM checklist WHERE id = $1 AND user_id = $2", [
+            id,
+            userId,
+        ]);
 
-        const checklist = checklistData[0] as Checklist;
-
-        if (!checklist) {
+        if (checklistData.rows.length === 0) {
             return res.status(404).json({ message: "Item not found" });
         }
 
-        const [resultData] = await pool.execute<ResultSetHeader>(
-            "UPDATE checklist SET title = ?, dateModified = CURRENT_TIMESTAMP WHERE id = ?",
+        const resultData = await pool.query<Checklist>(
+            "UPDATE checklist SET title = $1, date_modified = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id",
             [title, id]
         );
 
-        res.status(200).json({ message: "Checklist item updated", id: resultData.insertId, title });
+        res.status(200).json({ message: "Checklist item updated", id: resultData.rows[0].id, title });
     } catch (err) {
         res.status(500).json({ message: "Error updating item", error: err });
     }
@@ -148,20 +139,22 @@ export const deleteChecklist = async (req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: "Invalid ID" });
         }
 
-        const [checklistItem] = await pool.query<RowDataPacket[]>(
-            "SELECT * FROM checklist WHERE id = ? AND userId = ?",
-            [id, userId]
-        );
+        const checklistItem = await pool.query<Checklist>("SELECT * FROM checklist WHERE id = $1 AND user_id = $2", [
+            id,
+            userId,
+        ]);
 
-        const checklist = checklistItem[0] as Checklist;
-
-        if (!checklist) {
+        if (checklistItem.rows.length === 0) {
             return res.status(404).json({ message: "Item not found" });
         }
 
-        await pool.execute<ResultSetHeader>("DELETE FROM checklist WHERE id = ? AND userId = ?", [id, userId]);
+        await pool.query<Checklist>("DELETE FROM checklist WHERE id = $1 AND user_id = $2", [id, userId]);
 
-        res.status(200).json({ message: "Item successfully removed", id });
+        res.status(200).json({
+            message: "Item successfully removed",
+            id: checklistItem.rows[0].id,
+            title: checklistItem.rows[0].title,
+        });
     } catch (err) {
         res.status(500).json({ message: "Error deleting item", error: err });
     }

@@ -81,6 +81,9 @@ textarea {
   cursor: pointer;
   color: $color-3;
   margin-left: 30px;
+  display: flex;
+  align-self: baseline;
+  padding-top: 5px;
   transition: color 0.25s ease-in-out;
 
   &:hover {

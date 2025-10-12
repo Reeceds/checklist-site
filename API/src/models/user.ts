@@ -3,7 +3,6 @@ import { Checklist } from "./checklist";
 export interface User {
     id: number;
     email: string;
-    dateModified?: string;
-    refreshToken?: string;
-    checklist?: Checklist[];
+    date_modified?: string;
+    refresh_token?: string;
 }

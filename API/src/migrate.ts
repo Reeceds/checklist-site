@@ -3,13 +3,13 @@ import { Sequelize } from "sequelize";
 
 // Create a Sequelize connection just for migrations
 const sequelize = new Sequelize(
-    process.env.MYSQL_DATABASE as string,
-    process.env.MYSQL_USER as string,
-    process.env.MYSQL_PASSWORD as string,
+    process.env.POSTGRES_DATABASE as string,
+    process.env.POSTGRES_USER as string,
+    process.env.POSTGRES_PASSWORD as string,
     {
-        port: Number(process.env.MYSQL_PORT) || 3306,
-        host: process.env.MYSQL_HOST,
-        dialect: "mysql",
+        port: Number(process.env.POSTGRES_PORT) || 3306,
+        host: process.env.POSTGRES_HOST,
+        dialect: "postgres",
         logging: false,
     }
 );

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { pool } from "../db";
 import { checklistItem } from "../models/checklistItem";
 import { AuthRequest } from "../middleware/authorize";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 // POST create, update, delete
 export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
@@ -21,21 +20,21 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             if (invalidData) return res.status(400).json({ message: "Invalid checklist content" });
         }
 
-        const [dbItemsData] = await pool.query<RowDataPacket[]>(
-            "SELECT * FROM checklistItem WHERE checklistId = ? AND userId = ?",
+        const dbItemsData = await pool.query<checklistItem>(
+            "SELECT * FROM checklist_item WHERE checklist_id = $1 AND user_id = $2",
             [checklistId, userId]
         );
 
-        const dbItems = dbItemsData as checklistItem[];
+        const dbItems: checklistItem[] = dbItemsData.rows;
 
-        if (dbItems.length) {
+        if (dbItems.length > 0) {
             // UPDATE
             const updatedItems = reqData.filter((reqItem: checklistItem) =>
                 dbItems.some(
                     (dbItem: checklistItem) =>
                         dbItem.id === reqItem.id &&
                         (dbItem.content !== reqItem.content ||
-                            dbItem.isChecked !== reqItem.isChecked ||
+                            dbItem.is_checked !== reqItem.is_checked ||
                             dbItem.position !== reqItem.position)
                 )
             );
@@ -43,9 +42,9 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             if (updatedItems.length) {
                 await Promise.all(
                     updatedItems.map((e: checklistItem) => {
-                        pool.execute<ResultSetHeader>(
-                            "UPDATE checklistItem SET content = ?, isChecked = ?, position = ?, dateModified = CURRENT_TIMESTAMP WHERE id = ?",
-                            [e.content, e.isChecked, e.position, e.id]
+                        pool.query<checklistItem>(
+                            "UPDATE checklist_item SET content = $1, is_checked = $2, position = $3, date_modified = CURRENT_TIMESTAMP WHERE id = $4",
+                            [e.content, e.is_checked, e.position, e.id]
                         );
                     })
                 );
@@ -59,28 +58,28 @@ export const modifyChecklistItem = async (req: AuthRequest, res: Response) => {
             await Promise.all(
                 itemsToDelete.map((el: checklistItem) => {
                     if (itemsToDelete) {
-                        pool.execute<ResultSetHeader>("DELETE FROM checklistItem WHERE id = ?", [el.id]);
+                        pool.query<checklistItem>("DELETE FROM checklist_item WHERE id = $1", [el.id]);
                     }
                 })
             );
         }
 
-        // ADD
+        // CREATE
         var newItems = reqData.filter((el) => !el.id);
         if (newItems.length) {
             await Promise.all(
                 newItems.map((e: checklistItem) => {
-                    return pool.execute<ResultSetHeader>(
-                        "INSERT INTO checklistItem (content, checklistId, isChecked, position, userId) VALUES (?, ?, ?, ?, ?)",
-                        [e.content, checklistId, e.isChecked ?? 0, e.position ?? 0, userId]
+                    return pool.query<checklistItem>(
+                        "INSERT INTO checklist_item (content, checklist_id, is_checked, position, user_id) VALUES ($1, $2, $3, $4, $5)",
+                        [e.content, checklistId, e.is_checked ?? false, e.position ?? 0, userId]
                     );
                 })
             );
         }
 
         // UPDATE checklist dateModified
-        await pool.execute<ResultSetHeader>(
-            "UPDATE checklist SET dateModified = CURRENT_TIMESTAMP WHERE id = ? AND userId = ?",
+        await pool.query<checklistItem>(
+            "UPDATE checklist SET date_modified = CURRENT_TIMESTAMP WHERE id = $1 AND user_id = $2",
             [checklistId, userId]
         );
 

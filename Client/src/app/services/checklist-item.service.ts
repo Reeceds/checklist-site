@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { ChecklistItem } from '../models/checklistItem';
@@ -9,6 +9,8 @@ import { ChecklistItem } from '../models/checklistItem';
 })
 export class ChecklistItemService {
   private url = environment.apiUrl;
+
+  isChecklistSaved = signal<boolean>(true); // Used in the 'side-nav.component' to check for checklistItem changes before creating/editing the current checklist name
 
   constructor(private http: HttpClient) {}
 

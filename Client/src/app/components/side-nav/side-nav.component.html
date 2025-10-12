@@ -1,4 +1,7 @@
-<div class="sidebar sidebar-container">
+<div
+  class="sidebar sidebar-container"
+  [class.profile-container-collapsed]="!isSidePanelExpandedVal"
+>
   @if (isProfileNav) {
   <!-- PROFILE SIDE NAV -->
   <div class="profile-container">
@@ -16,12 +19,12 @@
     class="checklist-container"
     [class.checklist-container-collapsed]="!isSidePanelExpandedVal"
   >
-    @if (checklistData && checklistData.length > 0) {
     <fa-icon
       class="fa-lg create-checklist-btn"
       [icon]="faPenToSquare"
       (click)="openCreateModal()"
     ></fa-icon>
+    @if (checklistData && checklistData.length > 0) {
     <div class="item-section">
       @for (checklist of checklistData; track $index) {
       <a
@@ -53,12 +56,6 @@
       </a>
       }
     </div>
-    } @else {
-    <fa-icon
-      class="fa-lg create-checklist-btn"
-      [icon]="faPenToSquare"
-      (click)="openCreateModal()"
-    ></fa-icon>
     }
   </div>
   }

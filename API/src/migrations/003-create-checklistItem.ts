@@ -1,17 +1,17 @@
-import { DataTypes, QueryInterface } from "sequelize";
+import { DataTypes, QueryInterface, Sequelize } from "sequelize";
 
 export async function up({ context: queryInterface }: { context: QueryInterface }) {
-    await queryInterface.createTable("checklistItem", {
+    await queryInterface.createTable("checklist_item", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
         content: {
-            type: DataTypes.STRING(500),
+            type: DataTypes.TEXT,
             allowNull: false,
         },
-        isChecked: {
+        is_checked: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
@@ -20,20 +20,21 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        dateModified: {
-            type: "DATETIME",
-            defaultValue: queryInterface.sequelize.literal("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+        date_modified: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         },
-        userId: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            // You could also add a references here if you want checklistItem → user relation
+            // optionally add references if you have a users table
         },
-        checklistId: {
+        checklist_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: "checklist", // 👈 must match the actual table name
+                model: "checklist", // table name
                 key: "id",
             },
             onDelete: "CASCADE",
@@ -42,5 +43,5 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
 }
 
 export async function down({ context: queryInterface }: { context: QueryInterface }) {
-    await queryInterface.dropTable("checklistItem");
+    await queryInterface.dropTable("checklist_item");
 }

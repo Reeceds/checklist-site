@@ -20,6 +20,7 @@ import {
   faGripLines,
   faTrash,
   faTrashCan,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -47,14 +48,13 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   faGripLines = faGripLines;
   faTrash = faTrash;
   faTrashCan = faTrashCan;
+  faXmark = faXmark;
 
   destroyRef = inject(DestroyRef);
 
-  checklist: Checklist | undefined;
-  staticCheckedItems: ChecklistItem[] | undefined = [];
-  staticUncheckedItems: ChecklistItem[] | undefined = [];
-  checkedItems: ChecklistItem[] | undefined = [];
-  uncheckedItems: ChecklistItem[] | undefined = [];
+  checklist: Checklist = {};
+  checkedItems: ChecklistItem[] = [];
+  uncheckedItems: ChecklistItem[] = [];
 
   paramId: number | undefined;
 
@@ -97,27 +97,20 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
             this.checklist = res;
           }
 
-          if (res?.checklistItems) {
-            this.checkedItems = res.checklistItems
-              .filter((e) => e.isChecked === 1)
+          if (res?.checklist_items) {
+            this.checkedItems = res.checklist_items
+              .filter((e) => e.is_checked === true)
               .map((el, i) => ({
                 ...el,
-                tempId: i,
+                temp_id: i,
               }));
 
-            this.uncheckedItems = res.checklistItems
-              .filter((e) => e.isChecked === 0)
+            this.uncheckedItems = res.checklist_items
+              .filter((e) => e.is_checked === false)
               .map((el, i) => ({
                 ...el,
-                tempId: i,
+                temp_id: i,
               }));
-
-            this.staticCheckedItems = JSON.parse(
-              JSON.stringify(this.checkedItems)
-            );
-            this.staticUncheckedItems = JSON.parse(
-              JSON.stringify(this.uncheckedItems)
-            );
           }
         },
         error: (err) => console.log('Failed to get checklist: ', err),
@@ -125,47 +118,53 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   }
 
   onAddItem(item: ChecklistItem) {
+    this.checklistItemService.isChecklistSaved.set(false);
+
     if (this.checkedItems || this.uncheckedItems) {
       let positionArr: number[] = [];
       let tempIdArr: number[] = [];
 
       this.checkedItems!.forEach((el, i) => {
         positionArr.push(el.position!);
-        tempIdArr.push(el.tempId!);
+        tempIdArr.push(el.temp_id!);
       });
 
       this.uncheckedItems!.forEach((el, i) => {
         positionArr.push(el.position!);
-        tempIdArr.push(el.tempId!);
+        tempIdArr.push(el.temp_id!);
       });
 
       let maxPosition = positionArr.length > 0 ? Math.max(...positionArr) : 0;
       let maxTempId = tempIdArr.length > 0 ? Math.max(...tempIdArr) : 0;
 
       item.position = maxPosition + 1;
-      item.tempId = maxTempId + 1;
+      item.temp_id = maxTempId + 1;
     }
 
     this.uncheckedItems!.push(item);
   }
 
   onEditContent(value: string, id: number, chekedVal: any) {
+    this.checklistItemService.isChecklistSaved.set(false);
+
     const editCheckedItem = this.checkedItems?.find(
-      (i) => i.tempId === id && i.isChecked === chekedVal
+      (i) => i.temp_id === id && i.is_checked === chekedVal
     );
     const edituncheckedItem = this.uncheckedItems?.find(
-      (i) => i.tempId === id && i.isChecked === chekedVal
+      (i) => i.temp_id === id && i.is_checked === chekedVal
     );
     if (editCheckedItem) editCheckedItem!.content = value;
     if (edituncheckedItem) edituncheckedItem!.content = value;
   }
 
   onToggleChecked(id: number) {
+    this.checklistItemService.isChecklistSaved.set(false);
+
     const wasChecked = this.checkedItems?.find(
-      (i) => i.tempId === id && i.isChecked === false
+      (i) => i.temp_id === id && i.is_checked === false
     );
     const wasUnchecked = this.uncheckedItems?.find(
-      (i) => i.tempId === id && i.isChecked === true
+      (i) => i.temp_id === id && i.is_checked === true
     );
 
     if (wasChecked) {
@@ -175,7 +174,7 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
 
       this.uncheckedItems!.forEach((el, i) => {
         positionArr.push(el.position!);
-        tempIdArr.push(el.tempId!);
+        tempIdArr.push(el.temp_id!);
       });
 
       let maxPosition = positionArr.length > 0 ? Math.max(...positionArr) : 0;
@@ -184,8 +183,8 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
       const newUncheckedItem: ChecklistItem = {
         ...wasChecked,
         position: maxPosition + 1,
-        tempId: maxTempId + 1,
-        isChecked: 0,
+        temp_id: maxTempId + 1,
+        is_checked: false,
       };
 
       this.uncheckedItems?.push(newUncheckedItem);
@@ -197,7 +196,7 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
       const wasUncheckedIndex = this.uncheckedItems?.indexOf(wasUnchecked);
 
       this.checkedItems!.forEach((el, i) => {
-        tempIdArr.push(el.tempId!);
+        tempIdArr.push(el.temp_id!);
       });
 
       let maxTempId = tempIdArr.length > 0 ? Math.max(...tempIdArr) : 0;
@@ -205,8 +204,8 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
       const newCheckedItem: ChecklistItem = {
         ...wasUnchecked,
         position: 0,
-        tempId: maxTempId + 1,
-        isChecked: 1,
+        temp_id: maxTempId + 1,
+        is_checked: true,
       };
 
       this.checkedItems?.push(newCheckedItem);
@@ -215,11 +214,13 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   }
 
   onDeleteItem(checkedVal: any, id: number) {
+    this.checklistItemService.isChecklistSaved.set(false);
+
     const checkedItem = this.checkedItems!.find(
-      (e) => e.tempId === id && e.isChecked === checkedVal
+      (e) => e.temp_id === id && e.is_checked === checkedVal
     );
     const uncheckedItem = this.uncheckedItems!.find(
-      (e) => e.tempId === id && e.isChecked === checkedVal
+      (e) => e.temp_id === id && e.is_checked === checkedVal
     );
 
     if (checkedItem) {
@@ -244,15 +245,21 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
             timeOut: 1000,
           });
           this.eventTriggerService.getTitleTrigger('refreshChecklistData');
+
+          this.checklistItemService.isChecklistSaved.set(true);
         },
         error: (err) => {
-          this.toastr.error('Error');
+          this.toastr.error('Error', '', {
+            timeOut: 1000,
+          });
           console.log('Error saving checklistItems: ', err);
         },
       });
   }
 
   drop(event: CdkDragDrop<string[]>) {
+    this.checklistItemService.isChecklistSaved.set(false);
+
     moveItemInArray(
       this.uncheckedItems!,
       event.previousIndex,
@@ -265,18 +272,18 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   }
 
   canDeactivate(): boolean {
-    const isCheckedEqual =
-      JSON.stringify(this.staticCheckedItems) ===
-      JSON.stringify(this.checkedItems);
-    const isUncheckedEqual =
-      JSON.stringify(this.staticUncheckedItems) ===
-      JSON.stringify(this.uncheckedItems);
+    // Check for unsaved checklistItem changes
+    let confirmed: boolean = true;
 
-    if (!isCheckedEqual || !isUncheckedEqual) {
+    if (!this.checklistItemService.isChecklistSaved()) {
       this.eventTriggerService.closeModalTrigger('closeModal');
-      return confirm(
+      confirmed = confirm(
         'You have unsaved changes. Do you really want to leave this page?'
       );
+    }
+
+    if (confirmed) {
+      this.checklistItemService.isChecklistSaved.set(true);
     }
     return true;
   }

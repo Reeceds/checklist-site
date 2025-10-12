@@ -146,6 +146,10 @@
 }
 
 @include sm-display {
+  .profile-container-collapsed {
+    visibility: hidden;
+  }
+
   .checklist-container-collapsed {
     visibility: hidden;
   }

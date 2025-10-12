@@ -20,6 +20,7 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPenToSquare, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { EventTriggerService } from '../../services/event-trigger.service';
+import { ChecklistItemService } from '../../services/checklist-item.service';
 
 @Component({
   selector: 'app-side-nav',
@@ -43,7 +44,7 @@ export class SideNavComponent implements OnInit {
   faPenToSquare = faPenToSquare;
   faEllipsis = faEllipsis;
 
-  checklistData: Checklist[] | undefined;
+  checklistData: Checklist[] = [];
 
   isProfileNav: boolean = false;
   isChecklistNav: boolean = false;
@@ -64,6 +65,7 @@ export class SideNavComponent implements OnInit {
   constructor(
     private router: Router,
     private checklistService: ChecklistService,
+    private checklistItemService: ChecklistItemService,
     private eventTriggerService: EventTriggerService
   ) {}
 
@@ -130,9 +132,9 @@ export class SideNavComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.checklistData = res;
+          if (res && res.length > 0) {
+            this.checklistData = res;
 
-          if (this.checklistData && this.checklistData.length > 0) {
             // On page refresh. If no item id in url then load the first item in the arr, OR if there is id then do nothing to the url
             const urlParamId = Number(this.router.url.split('checklist/')[1]);
             const checklistExists = this.checklistData.find(
@@ -157,18 +159,44 @@ export class SideNavComponent implements OnInit {
     this.createChecklistForm.reset();
   }
 
-  openCreateModal() {
-    this.isCreateModalOpen = true;
-    this.createChecklistFormSubmitted = false;
-    this.emptyChecklistError = false;
-    this.duplicateChecklistError = false;
+  openCreateModal(): any {
+    let confirmed: boolean = true;
+
+    // Check for unsaved checklistItem changes
+    if (!this.checklistItemService.isChecklistSaved()) {
+      confirmed = confirm(
+        'You have unsaved changes. Do you really want to leave this page?'
+      );
+    }
+
+    if (confirmed) {
+      this.isCreateModalOpen = true;
+      this.createChecklistFormSubmitted = false;
+      this.emptyChecklistError = false;
+      this.duplicateChecklistError = false;
+    } else {
+      return;
+    }
   }
 
   openEditModal(id: number, title: string) {
-    this.isEditModalOpen = true;
-    this.editChecklistFormSubmitted = false;
-    this.emptyChecklistError = false;
-    this.duplicateChecklistError = false;
+    let confirmed: boolean = true;
+
+    // Check for unsaved checklistItem changes
+    if (!this.checklistItemService.isChecklistSaved()) {
+      confirmed = confirm(
+        'You have unsaved changes. Do you really want to leave this page?'
+      );
+    }
+
+    if (confirmed) {
+      this.isEditModalOpen = true;
+      this.editChecklistFormSubmitted = false;
+      this.emptyChecklistError = false;
+      this.duplicateChecklistError = false;
+    } else {
+      return;
+    }
 
     this.editChecklistForm.patchValue({
       id: String(id),
@@ -222,6 +250,7 @@ export class SideNavComponent implements OnInit {
         next: (res) => {
           this.getChecklists();
           this.closeModal();
+          this.checklistItemService.isChecklistSaved.set(true);
           this.router.navigate([`/app/checklist/${res.id}`]);
         },
         error: (err) => {
@@ -266,6 +295,7 @@ export class SideNavComponent implements OnInit {
         next: (_) => {
           this.getChecklists();
           this.closeModal();
+          this.checklistItemService.isChecklistSaved.set(true);
           this.eventTriggerService.getTitleTrigger('refreshChecklistData');
         },
         error: (err) => {

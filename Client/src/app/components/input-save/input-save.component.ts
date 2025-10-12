@@ -55,7 +55,7 @@ export class InputSaveComponent implements OnInit {
 
     const item: ChecklistItem = {
       content: value!,
-      isChecked: false,
+      is_checked: false,
       position: 0,
     };
 
