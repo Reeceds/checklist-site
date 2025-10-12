@@ -284,7 +284,9 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
 
     if (confirmed) {
       this.checklistItemService.isChecklistSaved.set(true);
+      return true;
+    } else {
+      return false;
     }
-    return true;
   }
 }
