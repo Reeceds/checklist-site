@@ -49,7 +49,7 @@ export class InputSaveComponent implements OnInit {
     const value = this.createChecklistItem.value.content;
 
     if (!value || value.trim() === '') {
-      console.log('Empty value.');
+      // console.log('Empty value.');
       return;
     }
 

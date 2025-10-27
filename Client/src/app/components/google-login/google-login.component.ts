@@ -47,7 +47,7 @@ export class GoogleLoginComponent {
       .subscribe({
         next: (res) => {
           this.isLoading = true;
-          console.log('Response from Google: ', res);
+          // console.log('Response from Google: ', res);
           const googleCreds: GoogleCredentials = {
             idToken: res.idToken,
             provider: res.provider,
@@ -72,7 +72,7 @@ export class GoogleLoginComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          console.log('Response from backend: ', res);
+          // console.log('Response from backend: ', res);
           if (res.isAuthSuccessful === true) {
             this.isUserAuthenticated = true;
 
