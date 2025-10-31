@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+    backend:
+        build:
+            context: ./API
+            dockerfile: Dockerfile
+            target: dev
+        environment:
+            NODE_ENV: development
+        develop:
+            watch:
+                - action: sync
+                  path: ./API/src
+                  target: /app/src
+                - action: rebuild
+                  path: ./API/package.json
+                - action: rebuild
+                  path: ./API/package-lock.json
+        ports:
+            - "${API_PORT}:3000"
+
+    frontend:
+        build:
+            context: ./Client
+            dockerfile: Dockerfile
+            target: dev
+        environment:
+            NODE_ENV: development
+        develop:
+            watch:
+                - action: sync
+                  path: ./Client/src
+                  target: /app/src
+                - action: rebuild
+                  path: ./Client/package.json
+                - action: rebuild
+                  path: ./Client/package-lock.json
+        ports:
+            - "${CLIENT_PORT_DEV}:4200"

@@ -1,8 +1,10 @@
+version: "3.9"
+
 services:
     postgres:
         image: postgres:15
         container_name: checklist_postgres
-        restart: always
+        restart: unless-stopped
         environment:
             POSTGRES_DB: ${POSTGRES_DATABASE}
             POSTGRES_USER: ${POSTGRES_USER}
@@ -11,6 +13,39 @@ services:
             - "${POSTGRES_PORT}:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    backend:
+        build:
+            context: ./API
+            dockerfile: Dockerfile
+            target: runner
+        container_name: checklist_api
+        restart: unless-stopped
+        env_file:
+            - .env
+        environment:
+            RUNNING_IN_DOCKER: "true"
+        ports:
+            - "${API_PORT}:3000"
+        depends_on:
+            - postgres
+
+    frontend:
+        build:
+            context: ./Client
+            dockerfile: Dockerfile
+            target: runner
+        container_name: checklist_client
+        restart: unless-stopped
+        ports:
+            - "${CLIENT_PORT}:80"
+        depends_on:
+            - backend
 
 volumes:
     postgres_data:

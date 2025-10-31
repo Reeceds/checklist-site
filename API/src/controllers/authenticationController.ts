@@ -84,7 +84,7 @@ export const refreshToken = async (req: Request, res: Response) => {
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: true, // ⚠️ Set to true only if HTTPS
-            sameSite: "none", // ⚠️ Adjust for production
+            sameSite: "none", //! Set as 'none' for prod
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -104,7 +104,7 @@ export const logout = async (_req: Request, res: Response) => {
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: true, // use false only for local dev without HTTPS
-            sameSite: "none", //! Change this for production
+            sameSite: "none", //! Set as 'none' for prod
         });
 
         return res.status(200).json({ message: "Logged out successfully" });

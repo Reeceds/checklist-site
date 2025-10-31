@@ -1,10 +1,19 @@
-import express from "express";
-import path from "path";
-import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config({ path: path.resolve(__dirname, "../../.env") }); //! Set environment variables globally avaialable
-import https from "https";
+import path from "path";
 import fs from "fs";
+// Load .env only when running locally (not inside Docker)
+// Docker Compose injects environment variables automatically.
+if (!process.env.RUNNING_IN_DOCKER) {
+    const envPath = path.resolve(__dirname, "../../.env");
+    dotenv.config({ path: envPath });
+    console.log(`Loaded .env from ${envPath}`);
+} else {
+    console.log("Running inside Docker — using container environment variables");
+}
+import express from "express";
+import cors from "cors";
+import http from "http";
+import https from "https";
 import cookieParser from "cookie-parser";
 import { runMigrationsWithRetry } from "./migrate";
 import checklistRoutes from "./routes/checklistRoutes";
@@ -16,16 +25,24 @@ import userRoutes from "./routes/userRoutes";
 const app: express.Application = express();
 const port: Number = Number(process.env.API_PORT);
 
-//! Use options and server for https certificate during development
-const options = {
-    key: fs.readFileSync(path.join(__dirname, "../ssl/localhost-key.pem")),
-    cert: fs.readFileSync(path.join(__dirname, "../ssl/localhost.pem")),
-};
-const server = https.createServer(options, app);
+// HTTPS setup (only used in development)
+let server;
+
+if (process.env.NODE_ENV === "development") {
+    const options = {
+        key: fs.readFileSync(path.join(__dirname, "../ssl/localhost-key.pem")),
+        cert: fs.readFileSync(path.join(__dirname, "../ssl/localhost.pem")),
+    };
+    server = https.createServer(options, app);
+    console.log("Using HTTPS (development mode)");
+} else {
+    server = http.createServer(app);
+    console.log("Using HTTP (production mode)");
+}
 
 app.use(
     cors({
-        origin: "http://localhost:4200",
+        origin: ["http://localhost:4200"],
         credentials: true, // Allow cookies and credentials
     })
 );

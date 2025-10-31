@@ -1,5 +1,6 @@
 import { Umzug, SequelizeStorage } from "umzug";
 import { Sequelize } from "sequelize";
+import path from "path";
 
 // Create a Sequelize connection just for migrations
 const sequelize = new Sequelize(
@@ -7,15 +8,19 @@ const sequelize = new Sequelize(
     process.env.POSTGRES_USER as string,
     process.env.POSTGRES_PASSWORD as string,
     {
-        port: Number(process.env.POSTGRES_PORT) || 3306,
+        port: Number(process.env.POSTGRES_PORT) || 5432,
         host: process.env.POSTGRES_HOST,
         dialect: "postgres",
         logging: false,
     }
 );
 
+// Detect runtime mode: .ts when running locally, .js dist file when running in Docker
+const isTs = path.extname(__filename) === ".ts";
+const migrationsGlob = isTs ? "src/migrations/*.ts" : "dist/migrations/*.js";
+
 export const migrator = new Umzug({
-    migrations: { glob: "src/migrations/*.ts" },
+    migrations: { glob: migrationsGlob },
     context: sequelize.getQueryInterface(),
     storage: new SequelizeStorage({ sequelize }),
     logger: console,
