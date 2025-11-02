@@ -146,6 +146,7 @@ export class SideNavComponent implements OnInit {
               ]);
             }
           } else {
+            this.checklistData = [];
             this.router.navigate([`/app/checklist/`]);
           }
         },

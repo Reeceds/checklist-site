@@ -90,6 +90,6 @@
   }
 </div>
 
-@if (checklist) {
+@if (checklistExists) {
 <app-input-save (newItem)="onAddItem($event)" (saveChecklist)="onSaveItems()" />
 }

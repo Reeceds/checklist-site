@@ -56,6 +56,8 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
   checkedItems: ChecklistItem[] = [];
   uncheckedItems: ChecklistItem[] = [];
 
+  checklistExists: boolean = false;
+
   paramId: number | undefined;
 
   constructor(
@@ -94,6 +96,7 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
       .subscribe({
         next: (res) => {
           if (res) {
+            this.checklistExists = Object.keys(res).length > 0;
             this.checklist = res;
           }
 
