@@ -7,9 +7,12 @@ import {
   throwError,
   filter,
   take,
+  finalize,
 } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { EventTriggerService } from '../services/event-trigger.service';
+import { faL } from '@fortawesome/free-solid-svg-icons';
 
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null); // To queue requests during refresh
@@ -17,9 +20,11 @@ const refreshTokenSubject = new BehaviorSubject<string | null>(null); // To queu
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const _authService = inject(AuthService);
+  const _eventTriggerService = inject(EventTriggerService);
 
   const accessToken = _authService.getAccessToken();
   const isRefreshRequest = req.url.includes('/refresh-token');
+  const isGoogleRequest = req.url.includes('/google-client-id');
 
   // Attach the Authorization header if the access token exists and it's not a refresh request
   let authReq = req;
@@ -30,6 +35,17 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+  }
+
+  // Display loading overlay until the Google button appears
+  if (isGoogleRequest) {
+    _eventTriggerService.getPendingTrigger(true);
+    return next(req).pipe(
+      finalize(() => {
+        // finalize() is always called after success or error — request is no longer pending
+        _eventTriggerService.getPendingTrigger(false);
+      })
+    );
   }
 
   return next(authReq).pipe(

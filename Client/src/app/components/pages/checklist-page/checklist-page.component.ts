@@ -96,7 +96,7 @@ export class ChecklistPageComponent implements OnInit, CanComponentDeactivate {
       .subscribe({
         next: (res) => {
           if (res) {
-            this.checklistExists = Object.keys(res).length > 0;
+            this.checklistExists = Object.keys(res).length > 0; // true if the checkklist object is not empty
             this.checklist = res;
           }
 

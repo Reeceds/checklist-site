@@ -14,11 +14,18 @@ export class EventTriggerService {
   private modalEventSource = new Subject<string>();
   modalEvent$ = this.modalEventSource.asObservable();
 
+  private pendingEventSource = new Subject<boolean>();
+  pendingEvent$ = this.pendingEventSource.asObservable();
+
   getTitleTrigger(event: string) {
     this.titleEventSource.next(event);
   }
 
   closeModalTrigger(event: string) {
     this.modalEventSource.next(event);
+  }
+
+  getPendingTrigger(event: boolean) {
+    this.pendingEventSource.next(event);
   }
 }

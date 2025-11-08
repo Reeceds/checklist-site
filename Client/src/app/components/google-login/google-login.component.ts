@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GoogleCredentials } from '../../models/googleCredentials';
 import { User } from '../../models/user';
+import { EventTriggerService } from '../../services/event-trigger.service';
 
 @Component({
   selector: 'app-google-login',
@@ -26,7 +27,7 @@ export class GoogleLoginComponent {
   destroyRef = inject(DestroyRef);
 
   isUserAuthenticated: boolean = false;
-  isLoading: boolean = false;
+  isLoading: boolean = true;
   isServerError: boolean = false;
 
   user: User | undefined;
@@ -34,11 +35,18 @@ export class GoogleLoginComponent {
   constructor(
     private _socialAuthService: SocialAuthService,
     private _authService: AuthService,
-    private router: Router
+    private router: Router,
+    private eventTriggerService: EventTriggerService
   ) {}
 
   ngOnInit() {
     this.googleLogin();
+
+    this.eventTriggerService.pendingEvent$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        res === true ? (this.isLoading = true) : (this.isLoading = false);
+      });
   }
 
   googleLogin() {
