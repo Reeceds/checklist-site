@@ -16,6 +16,8 @@ export const pool = new Pool({
     database: process.env.POSTGRES_DATABASE || "checklist-postgres-db", // default DB
     port: Number(process.env.POSTGRES_PORT) || 5432,
     max: 10,
+    connectionString: process.env.DATABASE_URL || "postgresql://root:rootpw@127.0.0.1:5432/checklist-postgres-db", // Required for Supabase (Postgress db server)
+    ssl: { rejectUnauthorized: false }, // Required for Supabase (Postgress db server)
 });
 
 // Test connection
