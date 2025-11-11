@@ -23,7 +23,7 @@ import authenticationRoutes from "./routes/authenticationRoutes";
 import userRoutes from "./routes/userRoutes";
 
 const app: express.Application = express();
-const port: Number = Number(process.env.API_PORT);
+const port: number = Number(process.env.API_PORT) || 3000;
 
 // HTTPS setup (only used in development)
 let server;
@@ -55,7 +55,7 @@ app.use("/api/checklistItem", checklistItemRoutes);
 app.use("/api/authentication", authenticationRoutes);
 app.use("/api/current-user", userRoutes);
 
-server.listen(port, async () => {
+server.listen(port, "0.0.0.0", async () => {
     try {
         await runMigrationsWithRetry(10, 5000); // 10 attempts, 5s apart
         console.log(`🚀 Server running at https://localhost:${port}/`);
