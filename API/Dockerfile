@@ -13,7 +13,7 @@ RUN npm run build
 
 
 # ============================
-# Stage 2: Development (for local Compose Watch)
+# Stage 2: Development (local only)
 # ============================
 FROM node:22.17.1-alpine AS dev
 
@@ -30,20 +30,22 @@ CMD ["nodemon", "--watch", "src", "src/index.ts"]
 
 
 # ============================
-# Stage 3: Production runtime (LAST!)
+# Stage 3: Production runtime (used by Render)
 # ============================
 FROM node:22.17.1-alpine AS runner
 
 WORKDIR /app
 
+# *** IMPORTANT FIXES ***
+ENV RUNNING_IN_DOCKER=true
+ENV NODE_OPTIONS="--dns-result-order=ipv4first"
+
+# copy the built JS
 COPY --from=builder /app/dist ./dist
 COPY package*.json ./
 
 RUN npm ci --omit=dev
 
-# Render looks at EXPOSE to detect your service port
 EXPOSE 3000
 
-# Production start command
 CMD ["node", "dist/index.js"]
-
