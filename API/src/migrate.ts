@@ -2,18 +2,39 @@ import { Umzug, SequelizeStorage } from "umzug";
 import { Sequelize } from "sequelize";
 import path from "path";
 
+let sequelize: Sequelize;
+
+// --- Use DATABASE_URL for Supabase / Render ---
 // Create a Sequelize connection just for migrations
-const sequelize = new Sequelize(
-    process.env.POSTGRES_DATABASE as string,
-    process.env.POSTGRES_USER as string,
-    process.env.POSTGRES_PASSWORD as string,
-    {
-        port: Number(process.env.POSTGRES_PORT) || 5432,
-        host: process.env.POSTGRES_HOST,
+if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
         dialect: "postgres",
+        protocol: "postgres",
         logging: false,
-    }
-);
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false,
+            },
+        },
+    });
+    console.log("Using DATABASE_URL for migrations");
+} else {
+    // --- Local development (Docker or host machine) ---
+    // Create a Sequelize connection just for migrations
+    sequelize = new Sequelize(
+        process.env.POSTGRES_DATABASE as string,
+        process.env.POSTGRES_USER as string,
+        process.env.POSTGRES_PASSWORD as string,
+        {
+            host: process.env.POSTGRES_HOST || "localhost",
+            port: Number(process.env.POSTGRES_PORT) || 5432,
+            dialect: "postgres",
+            logging: false,
+        }
+    );
+    console.log("Using local POSTGRES_* variables for migrations");
+}
 
 // Detect runtime mode: .ts when running locally, .js dist file when running in Docker
 const isTs = path.extname(__filename) === ".ts";
